@@ -1,0 +1,259 @@
+{
+  "parser": "mmmu",
+  "extract": "final",
+  "macro_acc": 62.22222222222222,
+  "micro_acc": 62.22222222222222,
+  "num_samples": 900,
+  "methods": {
+    "rule": 769,
+    "random": 78,
+    "open": 53
+  },
+  "extracts": {
+    "phrase": 743,
+    "none": 89,
+    "boxed": 68
+  },
+  "subjects": [
+    {
+      "subject": "Accounting",
+      "n": 30,
+      "correct": 24,
+      "acc": 80.0,
+      "not_rule": 0,
+      "truncated": 5
+    },
+    {
+      "subject": "Agriculture",
+      "n": 30,
+      "correct": 13,
+      "acc": 43.333333333333336,
+      "not_rule": 12,
+      "truncated": 0
+    },
+    {
+      "subject": "Architecture_and_Engineering",
+      "n": 30,
+      "correct": 19,
+      "acc": 63.333333333333336,
+      "not_rule": 7,
+      "truncated": 12
+    },
+    {
+      "subject": "Art",
+      "n": 30,
+      "correct": 13,
+      "acc": 43.333333333333336,
+      "not_rule": 9,
+      "truncated": 3
+    },
+    {
+      "subject": "Art_Theory",
+      "n": 30,
+      "correct": 24,
+      "acc": 80.0,
+      "not_rule": 4,
+      "truncated": 1
+    },
+    {
+      "subject": "Basic_Medical_Science",
+      "n": 30,
+      "correct": 20,
+      "acc": 66.66666666666667,
+      "not_rule": 3,
+      "truncated": 0
+    },
+    {
+      "subject": "Biology",
+      "n": 30,
+      "correct": 15,
+      "acc": 50.0,
+      "not_rule": 2,
+      "truncated": 2
+    },
+    {
+      "subject": "Chemistry",
+      "n": 30,
+      "correct": 11,
+      "acc": 36.666666666666664,
+      "not_rule": 1,
+      "truncated": 1
+    },
+    {
+      "subject": "Clinical_Medicine",
+      "n": 30,
+      "correct": 18,
+      "acc": 60.0,
+      "not_rule": 2,
+      "truncated": 0
+    },
+    {
+      "subject": "Computer_Science",
+      "n": 30,
+      "correct": 18,
+      "acc": 60.0,
+      "not_rule": 0,
+      "truncated": 0
+    },
+    {
+      "subject": "Design",
+      "n": 30,
+      "correct": 20,
+      "acc": 66.66666666666667,
+      "not_rule": 4,
+      "truncated": 0
+    },
+    {
+      "subject": "Diagnostics_and_Laboratory_Medicine",
+      "n": 30,
+      "correct": 8,
+      "acc": 26.666666666666668,
+      "not_rule": 1,
+      "truncated": 0
+    },
+    {
+      "subject": "Economics",
+      "n": 30,
+      "correct": 23,
+      "acc": 76.66666666666667,
+      "not_rule": 0,
+      "truncated": 0
+    },
+    {
+      "subject": "Electronics",
+      "n": 30,
+      "correct": 13,
+      "acc": 43.333333333333336,
+      "not_rule": 2,
+      "truncated": 5
+    },
+    {
+      "subject": "Energy_and_Power",
+      "n": 30,
+      "correct": 18,
+      "acc": 60.0,
+      "not_rule": 4,
+      "truncated": 12
+    },
+    {
+      "subject": "Finance",
+      "n": 30,
+      "correct": 21,
+      "acc": 70.0,
+      "not_rule": 0,
+      "truncated": 3
+    },
+    {
+      "subject": "Geography",
+      "n": 30,
+      "correct": 15,
+      "acc": 50.0,
+      "not_rule": 2,
+      "truncated": 2
+    },
+    {
+      "subject": "History",
+      "n": 30,
+      "correct": 21,
+      "acc": 70.0,
+      "not_rule": 0,
+      "truncated": 0
+    },
+    {
+      "subject": "Literature",
+      "n": 30,
+      "correct": 22,
+      "acc": 73.33333333333333,
+      "not_rule": 4,
+      "truncated": 0
+    },
+    {
+      "subject": "Manage",
+      "n": 30,
+      "correct": 21,
+      "acc": 70.0,
+      "not_rule": 1,
+      "truncated": 0
+    },
+    {
+      "subject": "Marketing",
+      "n": 30,
+      "correct": 25,
+      "acc": 83.33333333333333,
+      "not_rule": 0,
+      "truncated": 0
+    },
+    {
+      "subject": "Materials",
+      "n": 30,
+      "correct": 18,
+      "acc": 60.0,
+      "not_rule": 4,
+      "truncated": 11
+    },
+    {
+      "subject": "Math",
+      "n": 30,
+      "correct": 16,
+      "acc": 53.333333333333336,
+      "not_rule": 4,
+      "truncated": 1
+    },
+    {
+      "subject": "Mechanical_Engineering",
+      "n": 30,
+      "correct": 17,
+      "acc": 56.666666666666664,
+      "not_rule": 7,
+      "truncated": 13
+    },
+    {
+      "subject": "Music",
+      "n": 30,
+      "correct": 12,
+      "acc": 40.0,
+      "not_rule": 4,
+      "truncated": 11
+    },
+    {
+      "subject": "Pharmacy",
+      "n": 30,
+      "correct": 23,
+      "acc": 76.66666666666667,
+      "not_rule": 0,
+      "truncated": 2
+    },
+    {
+      "subject": "Physics",
+      "n": 30,
+      "correct": 23,
+      "acc": 76.66666666666667,
+      "not_rule": 0,
+      "truncated": 0
+    },
+    {
+      "subject": "Psychology",
+      "n": 30,
+      "correct": 23,
+      "acc": 76.66666666666667,
+      "not_rule": 0,
+      "truncated": 0
+    },
+    {
+      "subject": "Public_Health",
+      "n": 30,
+      "correct": 27,
+      "acc": 90.0,
+      "not_rule": 0,
+      "truncated": 1
+    },
+    {
+      "subject": "Sociology",
+      "n": 30,
+      "correct": 19,
+      "acc": 63.333333333333336,
+      "not_rule": 1,
+      "truncated": 0
+    }
+  ]
+}
