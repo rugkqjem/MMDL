@@ -15,11 +15,11 @@ Course team repo (MMDL). Assignment 1: build a reproducible evaluation pipeline 
 
 ```bash
 bash scripts/run_mmmu_eval.sh --model_path <HF id or ckpt dir> --data_root <HF datasets cache> --output_dir <dir> [--subjects Math] [--max_new_tokens N]   # GPU: infer once + score with both parsers
-python scripts/score.py --pred <dir>/predictions.jsonl --parser qwen|mmmu --output_dir <dir>   # CPU re-score, no re-inference
+python scripts/score.py --pred <dir>/predictions.jsonl --parser qwen|mmmu [--extract final|none] --output_dir <dir>   # CPU re-score, no re-inference
 python scripts/test_score.py   # CPU smoke check of prompt building + both scorers (needs numpy only)
 ```
 
-`scripts/infer.py` (vLLM, GPU only) → `predictions.jsonl` + `predictions_meta.json`; `scripts/score.py` → `scores_{parser}.{csv,json,md}`. `scripts/third_party/` holds verbatim copies of the Qwen and MMMU parsers — never edit them; adapt in `score.py`. Current work/next steps: `HANDOFF.md`.
+`scripts/infer.py` (vLLM, GPU only) → `predictions.jsonl` + `predictions_meta.json`; `scripts/score.py` → `scores_{parser}.{csv,json,md}` (`--extract final`, default: `extract_final_answer()` cuts the response to its final answer before the parser) and `scores_{parser}_raw.*` (`--extract none`: full response, upstream behavior). `scripts/third_party/` holds verbatim copies of the Qwen and MMMU parsers — never edit them; adapt in `score.py`. Current work/next steps: `HANDOFF.md`; run summary: `BASELINE_NOTES.md`.
 
 ## Hard constraints (from the spec — do not relax)
 
@@ -38,12 +38,16 @@ python scripts/test_score.py   # CPU smoke check of prompt building + both score
   - Open questions are scored via `MMMU_preproc`: rewritten as 2-choice (`A=gold`, `B="Other Answers"`) — lenient, and can false-positive when the response contains a standalone "A".
   - Loads VLMEvalKit's `MMMU_DEV_VAL.tsv` (dev+val, 1050 rows), not HF — must be replaced with the pinned HF dataset to satisfy the spec.
 - **MMMU official**: `MMMU-Benchmark/MMMU` → `mmmu/utils/eval_utils.py` (`parse_multi_choice_response`, `parse_open_response`, `eval_open`). The prompt in `configs/llava1.5.yaml` is LLaVA-1.5's, and `run_llava.py` only feeds `image_1`, so use this repo for parsing only.
+- **Final-answer extraction precedents** (the only markers `extract_final_answer()` may use — the pipeline is re-run on fine-tuned checkpoints, so no rules tuned to this model's outputs): last `\boxed{}` = hendrycks/math `modeling/dataset/util.py` `last_boxed_only_string`; `answer is` / `Answer:` = TIGER-AI-Lab/MMLU-Pro `evaluate_from_api.py` `extract_answer` / `extract_again`. Judgment calls on top: markdown `**`/`$` stripping and `answer is:` (optional colon). No marker → full response to the parser.
 
 ## Current state
 
-- Branch `assignment1-vllm-eval`: vLLM pipeline in `scripts/` (Qwen official prompt + model-card VL recipe, pinned HF data, two parsers). Written on a laptop; vLLM path not yet run on GPU — see `HANDOFF.md`.
-- Branch `origin/assignment1-eval` (`code/eval_mmmu.py`, `code/run.sh`, `results/mmmu_evaluation_report.csv`): HF `transformers.generate()` batch-1 baseline, overall 53.89 (485/900). Known issues: no dataset revision pin; the model card's *Text* recipe instead of the *VL* one (temp 1, top_p 1.0, top_k 40, presence 2.0; max_new_tokens 128); `presence_penalty` parsed but never passed to `generate`; no seed; prompt appends "Output ONLY the single option letter", which suppresses reasoning (likely the main cause of the gap); `min_pixels`/`max_pixels` placed in chat-template content are probably ignored by the HF processor; custom regex MC parser whose fallback matches any character; open answers scored by exact string match (list-valued gold answers like `"['Tampa', 'Florida']"` can never match). Keep its results as a "letter-only / short budget" control for gap analysis.
+- Branch `assignment1-vllm-eval`: full 900-question run done on A100 80GB (vLLM 0.30.0, transformers 5.17.0, torch 2.13.0, Python 3.12.14; `requirements.lock.txt`). Results committed in `outputs/qwen3vl4b_mmmu_val/`. Team-meeting summary of the run (settings, per-subject table, gap evidence, open decisions): `BASELINE_NOTES.md`. The submission report `reports/mmmu_baseline.md` is not written yet. Next steps: `HANDOFF.md`.
+  - Primary metric = Qwen parser + extraction: **62.11** (559/900); MMMU parser + extraction 62.22; raw (no extraction) 32.67 / 50.78. Official 67.4.
+  - Gap evidence: 85/900 (9.4%) hit `max_new_tokens` 16384 (7 correct, 18 are repetition loops); finished responses score 67.73%. 240 responses exceed 2048 tokens, so 2048 is not viable.
+  - MMMU parser randomly guesses on short `D. text` answers without a marker (37 of 42 finished MC cases) — why the Qwen parser is primary.
+- Branch `origin/assignment1-eval` (`code/eval_mmmu.py`, `code/run.sh`, `results/mmmu_evaluation_report.csv`): HF `transformers.generate()` batch-1 baseline, overall 53.89 (485/900). Known issues: no dataset revision pin; the model card's *Text* recipe instead of the *VL* one (temp 1, top_p 1.0, top_k 40, presence 2.0; max_new_tokens 128); `presence_penalty` parsed but never passed to `generate`; no seed; prompt appends "Output ONLY the single option letter", which suppresses reasoning; `min_pixels`/`max_pixels` placed in chat-template content are probably ignored by the HF processor; custom regex MC parser whose fallback matches any character; open answers scored by exact string match (list-valued gold answers like `"['Tampa', 'Florida']"` can never match). Keep its results as a "letter-only / short budget" control for gap analysis.
 
 ## Infra
 
-Evaluation runs on a remote A100 SXM 80GB (this Mac has no CUDA). With vLLM, submit all 900 requests in a single `llm.generate()` call (per-question calls lose continuous batching); set per-request `SamplingParams(seed=...)`; log `finish_reason == "length"` counts for truncation analysis; save raw responses before parsing so re-scoring doesn't require re-inference.
+Evaluation runs on a remote A100 SXM 80GB (this Mac has no CUDA). The venv needs a Python 3.12 **with headers** (`Python.h`): Triton compiles a C helper when the vLLM engine starts; Ubuntu's system 3.12 lacks headers and `ensurepip`, so the GPU box uses a uv-managed 3.12 (`uv venv --seed --python 3.12`). `load_dataset` per subject also downloads that subject's test split (~3GB total on first run). With vLLM, submit all 900 requests in a single `llm.generate()` call (per-question calls lose continuous batching); set per-request `SamplingParams(seed=...)`; log `finish_reason == "length"` counts for truncation analysis; save raw responses before parsing so re-scoring doesn't require re-inference.
