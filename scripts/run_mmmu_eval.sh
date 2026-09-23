@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# One-command MMMU-val eval: vLLM inference once, then score the same responses with both parsers.
+# One-command MMMU-val eval: vLLM inference once, then score the same responses with both parsers,
+# with and without final-answer extraction.
 # Usage: bash scripts/run_mmmu_eval.sh --model_path <HF id or ckpt dir> --data_root <HF datasets cache> --output_dir <dir> [infer.py args...]
 set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -15,5 +16,8 @@ done
 
 python "$DIR/infer.py" --output "$OUTPUT_DIR/predictions.jsonl" "${ARGS[@]+"${ARGS[@]}"}"
 for parser in qwen mmmu; do
-  python "$DIR/score.py" --pred "$OUTPUT_DIR/predictions.jsonl" --parser "$parser" --output_dir "$OUTPUT_DIR"
+  for extract in final none; do  # final -> scores_{parser}.*, none (upstream, full response) -> scores_{parser}_raw.*
+    python "$DIR/score.py" --pred "$OUTPUT_DIR/predictions.jsonl" --parser "$parser" --extract "$extract" \
+      --output_dir "$OUTPUT_DIR"
+  done
 done

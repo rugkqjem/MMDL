@@ -41,7 +41,7 @@ def parse_args():
     p.add_argument('--repetition_penalty', type=float, default=1.0)
     p.add_argument('--presence_penalty', type=float, default=1.5)
     p.add_argument('--seed', type=int, default=3407)
-    p.add_argument('--max_new_tokens', type=int, default=2048)
+    p.add_argument('--max_new_tokens', type=int, default=16384)  # model card VL recipe out_seq_length
     # Qwen run_mmmu.py build_mmmu_prompt()
     p.add_argument('--min_pixels', type=int, default=1280 * 28 * 28)
     p.add_argument('--max_pixels', type=int, default=5120 * 28 * 28)
