@@ -33,19 +33,24 @@ def parse_args():
     p.add_argument('--output', required=True, help='output JSONL path')
     p.add_argument('--subjects', nargs='+', default=SUBJECTS, help='subset for smoke tests; default all 30')
     # "VL" recipe from the pinned model card (huggingface.co/Qwen/Qwen3-VL-4B-Instruct @ebb281ec, README
-    # "Generation Hyperparameters"; same values in its generation_config.json). The card's "Text" recipe
-    # (1.0/1.0/40/2.0) is for text-only benchmarks. The card gives no seed; 3407 is from the GitHub README.
+    # "Generation Hyperparameters"); Qwen's run_mmmu.py uses the same values. generation_config.json only has
+    # temperature/top_p/top_k/repetition_penalty (no presence_penalty). The card's "Text" recipe (1.0/1.0/40/2.0)
+    # is for text-only benchmarks. The card gives no seed; 3407 is from the GitHub README (run_mmmu.py: 42).
     p.add_argument('--temperature', type=float, default=0.7)
     p.add_argument('--top_p', type=float, default=0.8)
     p.add_argument('--top_k', type=int, default=20)
     p.add_argument('--repetition_penalty', type=float, default=1.0)
     p.add_argument('--presence_penalty', type=float, default=1.5)
     p.add_argument('--seed', type=int, default=3407)
-    p.add_argument('--max_new_tokens', type=int, default=16384)  # model card VL recipe out_seq_length
+    # Model card VL recipe out_seq_length=16384. Qwen's run_mmmu.py / infer_instruct.sh use 32768 (max_model_len
+    # 128000), but a 32768 run did not help (62.11 -> 62.00): 1/900 responses finished beyond 16384, 97/98
+    # truncations were repetition loops, and generation took 3.4x longer. Prompts are <= ~5.6k tokens, so
+    # max_model_len 32768 never cuts a 16384-token answer.
+    p.add_argument('--max_new_tokens', type=int, default=16384)
+    p.add_argument('--max_model_len', type=int, default=32768)
     # Qwen run_mmmu.py build_mmmu_prompt()
     p.add_argument('--min_pixels', type=int, default=1280 * 28 * 28)
     p.add_argument('--max_pixels', type=int, default=5120 * 28 * 28)
-    p.add_argument('--max_model_len', type=int, default=32768)
     p.add_argument('--gpu_memory_utilization', type=float, default=0.9)
     return p.parse_args()
 
