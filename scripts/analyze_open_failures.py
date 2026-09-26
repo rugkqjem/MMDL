@@ -31,6 +31,7 @@ import string
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from score import normalize_latex  # noqa: E402  (the --normalize rules, single source of truth)
 from third_party.qwen_matching import can_infer  # noqa: E402
 
 csv.field_size_limit(10 ** 9)
@@ -43,21 +44,19 @@ _UNITS = re.compile(r'\b(?:k?(?:ohm|Omega)s?|[munk]?[AVWFHJ]|Hz|kHz|MHz|mm|cm|m|
 CATEGORIES = ['latex_only', 'format_only', 'rounding_near', 'wrong_value', 'no_marker', 'no_final_answer']
 
 
-def _strip_wrappers(s):
-    """Drop LaTeX spacing/formatting wrappers and units, keeping the arithmetic intact."""
-    s = re.sub(r'\\(?:left|right|,|;|!|\ )', ' ', s)
-    s = re.sub(r'\\(?:text|mathrm|mathbf)\{([^{}]*)\}', r'\1', s)
-    s = re.sub(r'\\(?:Omega|ohm|mu|circ|degree|percent)', ' ', s)
-    return _UNITS.sub(' ', s)
-
-
 def delatex(span):
-    """Resolve LaTeX notation to plain arithmetic. Changes notation only, never the value."""
-    s = _strip_wrappers(span)
-    s = re.sub(r'\\d?frac\{([^{}]+)\}\{([^{}]+)\}', r'\1/\2', s)
+    """score.py's --normalize rules plus the steps it deliberately leaves out.
+
+    normalize_latex() is strictly notation-preserving; for the diagnosis we additionally drop units and
+    evaluate \sqrt, so a symbolic answer can be compared numerically against a decimal gold. That is why
+    these extra steps live here and not behind --normalize.
+    """
+    s = normalize_latex(span)
+    s = re.sub(r'\\(?:Omega|ohm|mu|circ|degree|percent)', ' ', s)
+    s = s.replace(r'\approx', ' ')
+    s = _UNITS.sub(' ', s)
     s = re.sub(r'(?<=[\d)])\s*(?=\\sqrt)', '*', s)  # 2\sqrt{2} -> 2*\sqrt{2}
-    s = re.sub(r'\\sqrt\{?(\d+(?:\.\d+)?)\}?', lambda m: f'{float(m.group(1)) ** 0.5:.10g}', s)
-    s = s.replace(r'\times', '*').replace(r'\cdot', '*').replace(r'\approx', ' ').replace('$', '')
+    s = re.sub(r'\\sqrt\s*\{?(\d+(?:\.\d+)?)\}?', lambda m: f'{float(m.group(1)) ** 0.5:.10g}', s)
     return re.sub(r'\s+', ' ', s).strip()
 
 
@@ -145,12 +144,18 @@ def accepted(span, rec, gold_override=None):
 
 
 def recoverable_by(span, rec, gold_list):
-    """First normalization step (if any) that makes the unmodified rule accept the span."""
+    """First normalization step (if any) that makes the unmodified rule accept the span.
+
+    Ordered so that the first stage is exactly what score.py --normalize does; anything beyond it is a
+    rule we have not shipped.
+    """
     if accepted(span, rec):
         return 'already_correct'
+    if accepted(normalize_latex(span), rec, gold_override=normalize_latex(rec['answer'])):
+        return 'normalize_latex'          # == score.py --normalize
     d = delatex(span)
     if accepted(d, rec):
-        return 'delatex'
+        return 'delatex+units'
     v = to_float(d)
     if v is not None:
         for g in gold_list:
