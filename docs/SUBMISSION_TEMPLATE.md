@@ -1,9 +1,7 @@
 # MMMU-val Baseline Evaluation Report — Qwen3-VL-4B-Instruct
 
 - **팀명**: _(기입)_
-- **팀원**: 김유진
-- **팀원**: 류승희
-- **팀원**: 송지훈
+- **팀원**: _(기입)_
 - **작성일**: _(기입)_
 - **재현 커맨드**: `(예: bash scripts/run_mmmu_eval.sh)`
 

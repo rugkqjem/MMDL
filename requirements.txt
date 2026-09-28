@@ -1,0 +1,7 @@
+# Minimums known to support Qwen3-VL (Qwen3-VL README). Exact versions used are written to *_meta.json by infer.py;
+# freeze the GPU env after the first run (pip freeze > requirements.lock.txt) and commit it.
+vllm>=0.11.0
+transformers>=4.57.0
+qwen-vl-utils>=0.0.14
+datasets
+numpy
