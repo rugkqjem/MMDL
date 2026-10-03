@@ -52,6 +52,9 @@ def parse_args():
     p.add_argument('--min_pixels', type=int, default=1280 * 28 * 28)
     p.add_argument('--max_pixels', type=int, default=5120 * 28 * 28)
     p.add_argument('--gpu_memory_utilization', type=float, default=0.9)
+    # The spec fixes bf16. float16 exists only for run_ablation.sh --smoke on GPUs without bf16 (T4, V100);
+    # scores from such runs are not comparable to the reported ones.
+    p.add_argument('--dtype', default='bfloat16', choices=['bfloat16', 'float16'])
     return p.parse_args()
 
 
@@ -127,7 +130,7 @@ def main():
             })
     print(f'prepared {len(inputs)} samples')
 
-    llm = LLM(model=args.model_path, revision=revision, tokenizer_revision=revision, dtype='bfloat16',
+    llm = LLM(model=args.model_path, revision=revision, tokenizer_revision=revision, dtype=args.dtype,
               max_model_len=args.max_model_len, gpu_memory_utilization=args.gpu_memory_utilization,
               limit_mm_per_prompt={'image': 7}, seed=args.seed)
     sampling = SamplingParams(temperature=args.temperature, top_p=args.top_p, top_k=args.top_k,

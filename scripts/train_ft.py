@@ -63,17 +63,29 @@ def parse_args(argv=None):
     p.add_argument('--warmup_steps', type=float, default=0.03, help='int = steps, float in [0, 1) = ratio of total')
     p.add_argument('--weight_decay', type=float, default=0.0)
     p.add_argument('--save_steps', type=int, default=500)
+    p.add_argument('--save_strategy', default='steps', choices=['steps', 'epoch', 'no'],
+                   help="Trainer checkpoints (resumable); the final model is saved regardless. 'no' for smoke runs")
     p.add_argument('--logging_steps', type=int, default=10)
     p.add_argument('--dataloader_num_workers', type=int, default=4)
     p.add_argument('--gradient_checkpointing', action='store_true')
     p.add_argument('--attn_implementation', default='sdpa', help="'flash_attention_2' if installed")
     p.add_argument('--deepspeed', default=None, help='DeepSpeed config JSON, passed to TrainingArguments')
     p.add_argument('--seed', type=int, default=3407)
+    # auto = bf16 when the GPU has native bf16 (A100), else fp16 (T4/V100, for run_ablation.sh --smoke only:
+    # frozen weights round-trip through fp16, so such checkpoints are not for reported results). Saved as bf16 either way.
+    p.add_argument('--dtype', default='auto', choices=['auto', 'bf16', 'fp16'])
     p.add_argument('--use_cpu', action='store_true', help='smoke tests only (scripts/test_train.py)')
     args = p.parse_args(argv)
     if not (args.tune_deepstack or args.tune_merger or args.lora_llm):
         p.error('nothing to train: pass --tune_deepstack and/or --lora_llm')
     return args
+
+
+def resolve_dtype(name, use_cpu):
+    if name == 'auto':
+        native_bf16 = torch.cuda.is_available() and torch.cuda.is_bf16_supported(including_emulation=False)
+        name = 'bf16' if use_cpu or native_bf16 else 'fp16'
+    return name
 
 
 def freeze_and_unfreeze(model, args):
@@ -218,17 +230,20 @@ def main(argv=None):
     args = parse_args(argv)
     set_seed(args.seed)
     revision = None if os.path.isdir(args.model_path) else (args.model_revision or None)
+    dtype = resolve_dtype(args.dtype, args.use_cpu)
+    print(f'compute dtype: {dtype}')
 
     processor = AutoProcessor.from_pretrained(args.model_path, revision=revision)
     processor.image_processor.size = {'shortest_edge': args.min_pixels, 'longest_edge': args.max_pixels}
     model = Qwen3VLForConditionalGeneration.from_pretrained(
-        args.model_path, revision=revision, dtype=torch.bfloat16, attn_implementation=args.attn_implementation)
+        args.model_path, revision=revision, dtype=torch.bfloat16 if dtype == 'bf16' else torch.float16,
+        attn_implementation=args.attn_implementation)
     model.config.use_cache = False
 
     full_tuned = freeze_and_unfreeze(model, args)
     if args.lora_llm:
         model = add_lora(model, args, full_tuned)
-    # fp32 master copies for the trained weights (tiny lr updates vanish in bf16); cast back before the final save.
+    # fp32 master copies for the trained weights (tiny lr updates vanish in bf16/fp16); cast back before the final save.
     for p in model.parameters():
         if p.requires_grad:
             p.data = p.data.float()
@@ -248,11 +263,13 @@ def main(argv=None):
         warmup_steps=args.warmup_steps,
         weight_decay=args.weight_decay,
         lr_scheduler_type='cosine',
-        bf16=True,
+        bf16=dtype == 'bf16',
+        fp16=dtype == 'fp16',  # trained weights are fp32, so the fp16 GradScaler can unscale them
         use_cpu=args.use_cpu,
         logging_steps=args.logging_steps,
         # With LoRA, Trainer checkpoints hold only the adapters (no DeepStack weights); the final save below is the
         # full merged model, so treat intermediate checkpoints as LoRA-only snapshots.
+        save_strategy=args.save_strategy,
         save_steps=args.save_steps,
         save_total_limit=2,
         # Non-reentrant checkpointing: the frozen layers' inputs do not require grad, the DeepStack sums do.

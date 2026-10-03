@@ -56,6 +56,7 @@ Vision encoder is always frozen. Arms: **deepstack** (full FT of `model.model.vi
 
 ```bash
 python scripts/test_train.py   # CPU smoke test (~1 min): tiny random Qwen3-VL from the pinned config, 1 step per arm through run_ablation.sh
+bash scripts/run_ablation.sh --smoke --train_data <jsonl> --image_root <dir> --data_root <MMMU HF cache>   # real 4B weights on a small GPU before the A100 run
 bash scripts/run_ablation.sh --train_data <jsonl> --image_root <dir> --data_root <MMMU HF cache> [--out_root outputs/ablation] [--arms "deepstack lora both"] [--skip_baseline] [--skip_eval] [train_ft.py args...]
 python scripts/train_ft.py --train_data <jsonl> --image_root <dir> --output_dir <ckpt> --tune_deepstack [--lora_llm]   # one arm
 python scripts/compare_ablation.py --runs baseline=<eval dir> deepstack=<eval dir> ... [--output x.md]                # table from scores_qwen.json
@@ -63,12 +64,14 @@ python scripts/prepare_mmmu_sft.py --split dev --output_dir data/mmmu_dev_sft   
 ```
 
 - `run_ablation.sh` → `<out_root>/ckpt_<arm>/` (trained), `eval_baseline/` + `eval_<arm>/` (unchanged `run_mmmu_eval.sh`), `comparison.md`.
+- `--smoke` (small-GPU check, then hand off to the A100): 2 steps per arm, 64–256 visual tokens per image, `--max_length 2048`, no Trainer checkpoints; eval only `Math` (30 q), `--max_new_tokens 256`, `--max_model_len 4096`; output `outputs/ablation_smoke/`. Scores are meaningless — it only proves load → train → merge/save → vLLM load → score → compare all run. Needs ≥16GB VRAM (4B bf16 weights are ~9GB) and ~30GB disk for 3 checkpoints.
+- dtype: `train_ft.py --dtype auto` = bf16 on GPUs with native bf16, else fp16 (T4/V100; frozen weights round-trip through fp16, smoke only). `infer.py --dtype` defaults to `bfloat16` (spec); `--smoke` passes `float16` only when the GPU lacks bf16. Checkpoints are always saved bf16.
 - Data format = QwenLM/Qwen3-VL `qwen-vl-finetune` JSON/JSONL (`image` str|list, `conversations` human/gpt/system, `<image>` placeholders; no placeholders → images before the first user text, same layout as `infer.py`). Only assistant turns + their `<|im_end|>` are supervised. Over-long samples (`--max_length`, default 8192) are skipped, not truncated.
 - Main training data is not MMMU and runs on another GPU box. **Never train on MMMU `validation`** (it is the eval split); `prepare_mmmu_sft.py` only allows `dev`. Its target is `Answer: <gold>` (a marker `extract_final_answer()` knows), which teaches short answers — fine for a pipeline check, not a recipe.
 - Saved checkpoint = full bf16 model with LoRA merged (`merge_and_unload`) + processor + `train_args.json`; same tensor keys as the base, so vLLM loads it directly (`--model_revision ''`). Trainer's intermediate checkpoints under LoRA hold only adapters (no DeepStack weights).
 - Trained weights are kept in fp32 during training (bf16 loses small updates) and cast back to bf16 at save; `bf16=True` autocast. Separate LRs: `--learning_rate` (DeepStack/merger, 1e-5) and `--lora_learning_rate` (1e-4). Default image bounds = `infer.py`'s `min_pixels`/`max_pixels`.
 - transformers 5.17 API notes: vision tower is `model.model.visual` (4.57's `model.visual` property is gone, so QwenLM's `qwen-vl-finetune/train_qwen.py` `set_model()` does not run as is); `TrainingArguments` has no `warmup_ratio` (`warmup_steps` < 1 is a ratio); the processor returns `mm_token_type_ids`, which the model needs for M-RoPE — the collator pads it with the other sequence keys.
-- Verified only on CPU with the tiny model (2026-10-03): each arm changes exactly its tensors, LoRA merges away, checkpoint reloads. Not yet run on GPU / real weights; vLLM eval of a fine-tuned checkpoint not yet run.
+- Verified only on CPU with the tiny model (2026-10-03): each arm changes exactly its tensors, LoRA merges away, checkpoint reloads; `--smoke --skip_eval` arg handling. Not yet run on GPU / real weights; the fp16 path, `--smoke` eval stage and vLLM loading of a fine-tuned checkpoint are untested.
 
 ## Infra
 
