@@ -50,6 +50,26 @@ python scripts/test_score.py   # CPU smoke check of prompt building + both score
   - MMMU parser randomly guesses on short `D. text` answers without a marker (37 of 42 finished MC cases) — why the Qwen parser is primary.
 - Branch `origin/assignment1-eval` (`code/eval_mmmu.py`, `code/run.sh`, `results/mmmu_evaluation_report.csv`): HF `transformers.generate()` batch-1 baseline, overall 53.89 (485/900). Known issues: no dataset revision pin; the model card's *Text* recipe instead of the *VL* one (temp 1, top_p 1.0, top_k 40, presence 2.0; max_new_tokens 128); `presence_penalty` parsed but never passed to `generate`; no seed; prompt appends "Output ONLY the single option letter", which suppresses reasoning; `min_pixels`/`max_pixels` placed in chat-template content are probably ignored by the HF processor; custom regex MC parser whose fallback matches any character; open answers scored by exact string match (list-valued gold answers like `"['Tampa', 'Florida']"` can never match). Keep its results as a "letter-only / short budget" control for gap analysis.
 
+## Fine-tuning (DeepStack + LLM LoRA ablation)
+
+Vision encoder is always frozen. Arms: **deepstack** (full FT of `model.model.visual.deepstack_merger_list`), **lora** (LoRA on every LLM decoder-layer `q/k/v/o/gate/up/down_proj`), **both**. The main merger (`visual.merger`) stays frozen unless `--tune_merger`.
+
+```bash
+python scripts/test_train.py   # CPU smoke test (~1 min): tiny random Qwen3-VL from the pinned config, 1 step per arm through run_ablation.sh
+bash scripts/run_ablation.sh --train_data <jsonl> --image_root <dir> --data_root <MMMU HF cache> [--out_root outputs/ablation] [--arms "deepstack lora both"] [--skip_baseline] [--skip_eval] [train_ft.py args...]
+python scripts/train_ft.py --train_data <jsonl> --image_root <dir> --output_dir <ckpt> --tune_deepstack [--lora_llm]   # one arm
+python scripts/compare_ablation.py --runs baseline=<eval dir> deepstack=<eval dir> ... [--output x.md]                # table from scores_qwen.json
+python scripts/prepare_mmmu_sft.py --split dev --output_dir data/mmmu_dev_sft   # MMMU dev (150 q) -> train JSONL, pipeline checks only
+```
+
+- `run_ablation.sh` → `<out_root>/ckpt_<arm>/` (trained), `eval_baseline/` + `eval_<arm>/` (unchanged `run_mmmu_eval.sh`), `comparison.md`.
+- Data format = QwenLM/Qwen3-VL `qwen-vl-finetune` JSON/JSONL (`image` str|list, `conversations` human/gpt/system, `<image>` placeholders; no placeholders → images before the first user text, same layout as `infer.py`). Only assistant turns + their `<|im_end|>` are supervised. Over-long samples (`--max_length`, default 8192) are skipped, not truncated.
+- Main training data is not MMMU and runs on another GPU box. **Never train on MMMU `validation`** (it is the eval split); `prepare_mmmu_sft.py` only allows `dev`. Its target is `Answer: <gold>` (a marker `extract_final_answer()` knows), which teaches short answers — fine for a pipeline check, not a recipe.
+- Saved checkpoint = full bf16 model with LoRA merged (`merge_and_unload`) + processor + `train_args.json`; same tensor keys as the base, so vLLM loads it directly (`--model_revision ''`). Trainer's intermediate checkpoints under LoRA hold only adapters (no DeepStack weights).
+- Trained weights are kept in fp32 during training (bf16 loses small updates) and cast back to bf16 at save; `bf16=True` autocast. Separate LRs: `--learning_rate` (DeepStack/merger, 1e-5) and `--lora_learning_rate` (1e-4). Default image bounds = `infer.py`'s `min_pixels`/`max_pixels`.
+- transformers 5.17 API notes: vision tower is `model.model.visual` (4.57's `model.visual` property is gone, so QwenLM's `qwen-vl-finetune/train_qwen.py` `set_model()` does not run as is); `TrainingArguments` has no `warmup_ratio` (`warmup_steps` < 1 is a ratio); the processor returns `mm_token_type_ids`, which the model needs for M-RoPE — the collator pads it with the other sequence keys.
+- Verified only on CPU with the tiny model (2026-10-03): each arm changes exactly its tensors, LoRA merges away, checkpoint reloads. Not yet run on GPU / real weights; vLLM eval of a fine-tuned checkpoint not yet run.
+
 ## Infra
 
 Evaluation runs on a remote A100 SXM 80GB (this Mac has no CUDA). The venv needs a Python 3.12 **with headers** (`Python.h`): Triton compiles a C helper when the vLLM engine starts; Ubuntu's system 3.12 lacks headers and `ensurepip`, so the GPU box uses a uv-managed 3.12 (`uv venv --seed --python 3.12`). `load_dataset` per subject also downloads that subject's test split (~3GB total on first run). With vLLM, submit all 900 requests in a single `llm.generate()` call (per-question calls lose continuous batching); set per-request `SamplingParams(seed=...)`; log `finish_reason == "length"` counts for truncation analysis; save raw responses before parsing so re-scoring doesn't require re-inference.
