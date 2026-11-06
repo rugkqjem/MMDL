@@ -47,12 +47,13 @@ def main():
     p.add_argument('--out', required=True)
     p.add_argument('--image_root', default=None, help='if set, image paths are written as absolute paths')
     p.add_argument('--keep_trunc_mixed', action='store_true')
+    p.add_argument('--min_options', type=int, default=3, help='same as rl_rollout_filter.py (0 = keep all)')
     p.add_argument('--max_items', type=int, default=None, help='cap, stratified by category')
     p.add_argument('--val_size', type=int, default=0, help='held-out RL validation split')
     p.add_argument('--seed', type=int, default=0)
     args = p.parse_args()
 
-    data = {r['id']: r for r in read_jsonl(args.data)}
+    data = {r['id']: r for r in read_jsonl(args.data) if len(r.get('options') or []) >= args.min_options}
     ro = [r for r in read_jsonl(args.rollouts) if r['id'] in data]
     keep_b = {'mixed'} | ({'zero_trunc_mixed'} if args.keep_trunc_mixed else set())
     kept = [r for r in ro if bucket(r) in keep_b]

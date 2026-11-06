@@ -99,8 +99,12 @@ def main():
     p.add_argument('--out', required=True)
     p.add_argument('--n', type=int, default=8)
     p.add_argument('--stage1_n', type=int, default=4, help='0 = draw all n at once')
-    p.add_argument('--chunk', type=int, default=256, help='questions per generate() call')
+    p.add_argument('--chunk', type=int, default=1024,
+                   help='questions per generate() call; large, so one 8k-token straggler does not idle the GPU')
     p.add_argument('--limit', type=int, default=None)
+    p.add_argument('--min_options', type=int, default=3,
+                   help='skip questions with fewer options: on yes/no items the model answers in ~4 tokens without '
+                        'reasoning, so lucky guesses look like "mixed" groups and RL would reward guessing (0 = keep all)')
     p.add_argument('--shuffle', action='store_true', help='shuffle before --limit (random pilot sample)')
     p.add_argument('--save_responses', default=None, help='also write every response here (large)')
     p.add_argument('--dry_run', action='store_true')
@@ -112,6 +116,10 @@ def main():
 
     with open(own.data, encoding='utf-8') as f:
         rows = [json.loads(l) for l in f if l.strip()]
+    if own.min_options:
+        n0 = len(rows)
+        rows = [r for r in rows if len(r.get('options') or []) >= own.min_options]
+        print(f'[rollout] --min_options {own.min_options}: dropped {n0 - len(rows)} of {n0}', file=sys.stderr)
     if own.shuffle:
         random.Random(args.seed).shuffle(rows)
     if own.limit:
