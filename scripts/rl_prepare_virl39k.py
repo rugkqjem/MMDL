@@ -49,7 +49,7 @@ INSTR = re.compile(r"option'?s? letter|correct option|answer with the|answer the
 # marker styles for letter L, most reliable first
 STYLES = {
     'paren': lambda L: re.compile(r'\(' + L + r'\)'),                                  # (A)
-    'line': lambda L: re.compile(r'(?:^|\n)[ \t]*\(?' + L + r'\s*[.:：)]'),             # A.  A)  A:  at line start
+    'line': lambda L: re.compile(r'(?:^|\n)[ \t]*\(?' + L + r'\s*[.:：),]'),            # A.  A)  A:  A,  at line start
     'inline': lambda L: re.compile(r'(?:(?<=\s)|(?<=^))' + L + r'[.:)]\s'),           # " A. " anywhere
 }
 
@@ -84,6 +84,13 @@ def _find_sequence(text, style):
     return None
 
 
+def drop_instructions(line):
+    """Remove only the instruction *sentences* of a line ('Please select the correct options:'), keep the rest."""
+    parts = re.split(r'(?<=[.?!:：])\s+', line.strip())
+    keep = [x for x in parts if x and not INSTR.search(x) and not re.fullmatch(r'(?:hint|note)\s*[:：]', x, re.I)]
+    return ' '.join(keep).strip()
+
+
 def _clean_opt(t):
     t = t.strip().rstrip(',;').strip()
     return re.sub(r'\s+', ' ', t)
@@ -108,10 +115,10 @@ def split_options(q):
         if any(not o or len(o) > 400 for o in opts):
             continue
         stem = HDR_TAIL.sub('', q[:seq[0][1]].rstrip()).rstrip()
-        extra = [ln for ln in tail.split('\n') if ln.strip() and not INSTR.search(ln)]
-        stem = '\n'.join([stem] + extra).strip()
-        stem = '\n'.join(ln for ln in stem.split('\n') if not INSTR.search(ln)).strip()
-        stem = re.sub(r'^\s*question\s*[:：]\s*', '', stem, flags=re.I)  # build_messages adds 'Question: '
+        extra = [drop_instructions(ln) for ln in tail.split('\n')]
+        stem = '\n'.join([stem] + [x for x in extra if x]).strip()
+        stem = '\n'.join(x for x in (drop_instructions(ln) for ln in stem.split('\n')) if x).strip()
+        stem = re.sub(r'^\s*question\s*[:：]\s*', '', stem, flags=re.I | re.M)  # build_messages adds 'Question: '
         if stem:
             return stem, opts
     return q, []
@@ -120,22 +127,60 @@ def split_options(q):
 _NORM = lambda s: re.sub(r'[\s$]+', '', re.sub(r'\\text\{([^{}]*)\}', r'\1', str(s))).lower().rstrip('.')
 
 
-def gold_letter(gold, options):
-    """Letter gold ('B', '(B)', 'B. 45°', '\\text{B}') or the exact text of one option -> 'B'; else None."""
+def gold_letter(gold, options, text_only=False):
+    """Letter gold ('B', '(B)', 'B. 45°', '\\text{B}') or the exact text of one option -> 'B'; else None.
+    text_only: the options carried no letters in the source, so the gold is option *text* (it can itself be a
+    letter, e.g. options 'C / A / D / B' with gold 'D' means the third option, not the fourth)."""
     g = re.sub(r'\\text\{([^{}]*)\}', r'\1', gold).strip()
+    hits = [LETTERS[i] for i, o in enumerate(options) if _NORM(o) == _NORM(g)]
+    if text_only:
+        return hits[0] if len(hits) == 1 else None
     m = re.fullmatch(r'\(?([A-J])\)?(?:[.:)]\s*.*)?', g, flags=re.S)
     if m and m.group(1) in LETTERS[:len(options)]:
         return m.group(1)
-    hits = [LETTERS[i] for i, o in enumerate(options) if _NORM(o) == _NORM(g)]
     return hits[0] if len(hits) == 1 else None
+
+
+# "<question>?\nJ\nG\nA\nE\nPlease answer the question based on the options mentioned before." (AI2D-style)
+UNLETTERED_INSTR = re.compile(r'options (?:mentioned before|above|given above)|(?:from|among) the (?:following|options)',
+                              re.I)
+
+
+def split_unlettered(q):
+    """Options given one per line without letters, closed by an instruction line -> (stem, options) or (q, [])."""
+    lines = [ln.strip() for ln in q.split('\n')]
+    k = next((i for i in range(len(lines) - 1, -1, -1) if UNLETTERED_INSTR.search(lines[i])), None)
+    if k is None:
+        return q, []
+    j = k - 1
+    while j >= 0 and lines[j] and len(lines[j]) <= 120 and not lines[j].endswith(('?', ':', '：')):
+        j -= 1
+    opts = [ln for ln in lines[j + 1:k] if ln]
+    stem = '\n'.join(ln for ln in lines[:j + 1] if ln).strip()
+    if not (2 <= len(opts) <= len(LETTERS)) or not stem or len(set(map(_NORM, opts))) != len(opts):
+        return q, []
+    stem = re.sub(r'^\s*question\s*[:：]\s*', '', stem, flags=re.I)
+    return stem, opts
+
+
+def normalize_text(raw_q):
+    """Drop image tags; turn literal '\\n' (and '/n' left between image tags) into real line breaks."""
+    q = IMG_TAG.sub('', raw_q)
+    q = re.sub(r'^(?:\s*/n)+', '', q)              # '<image>/n<image>/nBased on ...'
+    q = re.sub(r'\\n(?![a-z])', '\n', q)          # literal backslash-n, but not \\nu, \\neq, \\nabla, ...
+    return q.strip()
 
 
 def parse_question(raw_q, gold):
     """-> (stem, options, letter_or_None, kind) with kind in {mc, mc_gold_not_in_options, mc_unparsed, open}."""
-    q = IMG_TAG.sub('', raw_q).strip()
+    q = normalize_text(raw_q)
     stem, opts = split_options(q)
+    text_only = False
+    if not opts:
+        stem, opts = split_unlettered(q)
+        text_only = bool(opts)
     if opts:
-        letter = gold_letter(gold, opts)
+        letter = gold_letter(gold, opts, text_only)
         return stem, opts, letter, ('mc' if letter else 'mc_gold_not_in_options')
     if re.fullmatch(r'\(?[A-J]\)?\.?', gold.strip()):
         return q, [], None, 'mc_unparsed'
