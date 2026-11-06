@@ -93,14 +93,18 @@ class Embedder:
         import torch
         from transformers import CLIPModel, CLIPProcessor
         self.torch = torch
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        mps = getattr(torch.backends, "mps", None)
+        self.device = device or ("cuda" if torch.cuda.is_available()
+                                 else "mps" if mps is not None and mps.is_available() else "cpu")
         self.model = CLIPModel.from_pretrained(name).to(self.device).eval()
         self.proc = CLIPProcessor.from_pretrained(name)
 
     def __call__(self, imgs):
         with self.torch.no_grad():
             x = self.proc(images=[i.convert("RGB") for i in imgs], return_tensors="pt").to(self.device)
-            e = self.model.get_image_features(**x)
+            out = self.model.get_image_features(**x)
+            # transformers 5.x returns BaseModelOutputWithPooling (projected embeds in pooler_output); 4.x a tensor
+            e = getattr(out, "pooler_output", out)
             e = e / e.norm(dim=-1, keepdim=True)
         return e.float().cpu().numpy()
 

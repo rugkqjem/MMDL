@@ -20,7 +20,7 @@
 
 ## 1. 다운로드 + 변환
 ```bash
-huggingface-cli download TIGER-Lab/ViRL39K --repo-type dataset --local-dir data/virl39k_raw
+hf download TIGER-Lab/ViRL39K --repo-type dataset --local-dir data/virl39k_raw
 python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/all.jsonl      # 카테고리 분포 확인
 python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/sub.jsonl \
     --exclude_categories GradeSchool --max_per_category 3000
