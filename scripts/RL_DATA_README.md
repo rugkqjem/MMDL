@@ -21,14 +21,19 @@
 ## 1. 다운로드 + 변환
 ```bash
 hf download TIGER-Lab/ViRL39K --repo-type dataset --local-dir data/virl39k_raw
-python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/all.jsonl      # 카테고리 분포 확인
-python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/sub.jsonl \
-    --exclude_categories GradeSchool --max_per_category 3000
+python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/all.jsonl --dump_skipped 15  # 카테고리 분포 확인
+python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/sub.jsonl --max_per_category 3000
 ```
+ViRL39K는 보기를 문제 텍스트 안에 여러 형식으로 적어 둬요("Choices: (A) .. (B) ..", 줄마다 "A. ..", "A: ..", 헤더 없이 "(A) .. (B) .."
+등). 변환기가 A, B, C… 순서로 이어지는 표시를 찾아 보기로 떼어 내고, 정답이 글자든 보기 내용이든 해당 글자로 바꿔요.
+`--dump_skipped N`을 주면 버려진 문제를 이유별로 N개씩 `<out>_skipped.txt`에 남겨서, 변환기가 놓치는 형식을 바로 확인할 수 있어요.
+GradeSchool 카테고리는 미리 빼지 않아요. 너무 쉬운 문제는 난이도 필터링에서 어차피 걸러져요.
+변환된 행의 `passrate_32b`는 원본의 `PassRate_32BTrained`(RL 학습된 32B 모델의 정답률)예요. 값이 없으면 -1이에요.
 **객관식만 남는 게 기본값이에요.** `score_qwen`은 주관식을 `{A: 정답, B: 'Other Answers'}`로 바꾼 뒤
 "예측에 정답 문자열이 포함돼 있는지"로 채점해요. 그래서 정답이 "3"이면 "13"도 정답 처리됩니다.
 점수를 보고할 때는 괜찮지만, RL 보상으로 쓰면 모델이 이 허점을 파고들 수 있어요(보상 해킹). MMMU-val도 대부분 객관식이고요.
-보기를 파싱할 수 없는 문제(정답은 글자인데 보기 형식이 특이한 경우)는 `score_qwen`으로 채점할 수 없어서 뺍니다.
+정답은 글자인데 보기 목록을 찾지 못한 문제(`mc_unparsed`)와, 보기는 찾았지만 정답이 어느 보기와도 안 맞는 문제(`mc_gold_not_in_options`)는
+`score_qwen`으로 채점할 수 없어서 뺍니다.
 
 ## 2. MMMU 중복 제거
 ```bash

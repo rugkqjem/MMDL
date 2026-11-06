@@ -9,14 +9,15 @@
 #   nohup bash server/rl_data_setup.sh > /workspace/rl_data_setup.log 2>&1 &   tail -f /workspace/rl_data_setup.log
 #
 # Re-running is safe: finished steps are skipped (venv, downloads, prepared JSONL, decontam output, pilot ids).
-# Knobs (env vars): BRANCH, EXCLUDE, MAX_PER_CAT, PILOT_N, MAX_NEW_TOKENS, NO_EMBED=1 (skip CLIP in decontam)
+# Knobs (env vars): BRANCH, EXCLUDE (category substrings, default none), MAX_PER_CAT, PILOT_N, MAX_NEW_TOKENS,
+#   NO_EMBED=1 (skip CLIP in decontam), RESET_DATA=1 (redo steps 4-7 after a converter change; keeps the MMMU cache)
 set -euo pipefail
 
 WS=/workspace
 REPO=$WS/MMDL
 VENV=$WS/venv
 BRANCH=${BRANCH:-rl-grpo}
-EXCLUDE=${EXCLUDE:-GradeSchool}
+EXCLUDE=${EXCLUDE:-}   # too-easy questions are dropped by the rollout filter anyway
 MAX_PER_CAT=${MAX_PER_CAT:-3000}
 PILOT_N=${PILOT_N:-200}
 MAX_NEW_TOKENS=${MAX_NEW_TOKENS:-8192}   # = planned GRPO max response length
@@ -69,13 +70,18 @@ wait $pid_model && echo "[$(ts)] model ok"
 wait $pid_virl && echo "[$(ts)] ViRL39K ok"
 du -sh data/virl39k_raw
 
-step "4. ViRL39K -> JSONL (exclude: $EXCLUDE, max per category: $MAX_PER_CAT)"
+step "4. ViRL39K -> JSONL (exclude: ${EXCLUDE:-none}, max per category: $MAX_PER_CAT)"
+if [[ ${RESET_DATA:-0} == 1 ]]; then
+  echo "RESET_DATA=1: removing converted data, decontam output and rollouts (MMMU reference cache is kept)"
+  rm -rf data/virl39k outputs/decontam/virl outputs/rl_rollout
+fi
 mkdir -p data/virl39k
+# all.jsonl: every parsable question, plus 15 examples per skip reason in all_skipped.txt to check the converter
 [[ -s data/virl39k/all_stats.txt ]] || python scripts/rl_prepare_virl39k.py --src data/virl39k_raw \
-  --out data/virl39k/all.jsonl | tee data/virl39k/all_stats.txt
+  --out data/virl39k/all.jsonl --dump_skipped 15 | tee data/virl39k/all_stats.txt
 if [[ ! -s data/virl39k/sub.jsonl ]]; then
   python scripts/rl_prepare_virl39k.py --src data/virl39k_raw --out data/virl39k/sub.jsonl \
-    --exclude_categories $EXCLUDE --max_per_category $MAX_PER_CAT
+    --max_per_category $MAX_PER_CAT ${EXCLUDE:+--exclude_categories $EXCLUDE}
 fi
 wc -l data/virl39k/sub.jsonl
 
