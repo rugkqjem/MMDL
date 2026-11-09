@@ -70,7 +70,27 @@ python scripts/rl_select.py --rollouts outputs/rl_rollout/rollouts.jsonl --data 
 - `--keep_trunc_mixed`: 0번 맞혔더라도 일부만 잘린 문제를 같이 남겨요. 잘림 페널티가 있는 보상이면 이 그룹도 학습 신호가 있어요.
 - `train_report.md`에 버킷 분포, 카테고리별 pass rate, 잘림 비율이 정리돼요.
 - 출력의 `problem`은 `<image>` 태그 + 평가 프롬프트예요(EasyR1 형식). EasyR1을 쓰면 기본 `format_prompt`(r1v.jinja 같은 수학용 템플릿)를
-  **꺼야** 평가 프롬프트가 그대로 유지돼요. 보상 함수는 `extract_final_answer` + `score_qwen` + 잘림 페널티로 따로 작성해야 합니다.
+  **꺼야** 평가 프롬프트가 그대로 유지돼요. 보상 함수는 6번의 `rl_reward.py`를 쓰세요.
+
+## 6. 보상 함수 (`rl_reward.py`)
+평가 채점기(`extract_final_answer` + `score_qwen`)를 그대로 쓰고 잘림 패널티만 더해요. 잘림을 **채점보다 먼저** 확인해요.
+
+| 응답 | 보상 |
+|---|---:|
+| 잘림 (최대 길이에 닿았고 마지막 토큰이 EOS가 아님) | `-trunc_penalty` (기본 0.5) |
+| 끝까지 쓰고 정답 | 1.0 |
+| 끝까지 쓰고 오답 / 파싱 실패 | 0.0 |
+
+- TRL `GRPOTrainer`용: `make_reward_func(max_completion_length=8192, eos_ids=..., trunc_penalty=0.5)`. 데이터셋에 `answer`, `options` 열이 있어야 해요.
+  `GRPOConfig(mask_truncated_completions=False)`로 두세요(True면 잘린 응답이 학습에서 빠져 루프 신호가 사라져요).
+- 주관식(보기 없음)은 오류를 내요. `score_qwen`이 "정답 문자열 포함"으로 채점해서 보상 해킹이 되기 때문이에요.
+- 검증(CPU):
+```bash
+python scripts/test_rl_reward.py                     # 합성 케이스
+python scripts/check_rl_reward.py --mmmu             # MMMU 객관식 847개: 평가 채점과 847/847 일치해야 함
+python scripts/check_rl_reward.py --rollouts_resp outputs/rl_rollout/rollouts_resp.jsonl \
+    --ids data/rl/train_noA.jsonl --penalties 0 0.25 0.5 1   # 롤아웃 판정 재현 + 패널티별 '신호 없는 그룹' 비율
+```
 
 ## GPU 없이 파이프라인만 테스트
 ```bash
