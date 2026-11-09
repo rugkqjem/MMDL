@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# vast.ai (A100 80GB, disk >= 150GB): fresh or reused instance -> GRPO pilot (20 optimizer steps).
-#   eval env (/workspace/venv, requirements.lock.txt) + TRL/PEFT installed with the lock as a constraint
+# Lab A100, >= 60GB free disk: env setup -> GRPO pilot (20 optimizer steps).
+#   eval env ($WS/venv, requirements.lock.txt) + TRL/PEFT installed with the lock as a constraint
 #   -> model + ViRL39K images -> CPU checks -> pilot -> pilot summary
 # Stops after the pilot on purpose: read the summary (signal, truncation, time per step) before the full run.
 #
 # Before running, copy the GRPO data from the Mac (data/ is gitignored):
-#   scp -P <port> -r ~/Desktop/MMMU/MMDL/data/rl root@<host>:/workspace/MMDL/data/
-#   nohup bash server/rl_train_setup.sh > /workspace/rl_train_setup.log 2>&1 &   tail -f /workspace/rl_train_setup.log
-# Re-running is safe: finished steps are skipped. Knobs (env vars): BRANCH, PILOT_STEPS, SAMPLING (train|eval),
+#   scp -r ~/Desktop/MMMU/MMDL/data/rl <user>@<host>:<WS>/MMDL/data/
+#   WS=<WS> nohup bash server/rl_train_setup.sh > rl_train_setup.log 2>&1 &   tail -f rl_train_setup.log
+# Re-running is safe: finished steps are skipped. Knobs (env vars): WS (work dir, default /workspace), BRANCH, PILOT_STEPS, SAMPLING (train|eval),
 #   TRUNC_PENALTY, EXTRA (more train_grpo.py args, e.g. "--per_device_train_batch_size 1 --gradient_accumulation_steps 32")
 set -euo pipefail
 
-WS=/workspace
+WS=${WS:-/workspace}
 REPO=$WS/MMDL
 VENV=$WS/venv
 BRANCH=${BRANCH:-rl-grpo}
