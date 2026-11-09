@@ -1,0 +1,8 @@
+# GRPO training (scripts/train_grpo.py), installed INTO the eval env with the eval lock as a constraint:
+#   uv pip install -r requirements.rl.txt -c requirements.lock.txt
+# The constraint keeps torch / vllm / transformers / qwen-vl-utils at the exact eval versions; if TRL ever needed
+# different ones the install fails instead of silently changing the eval env.
+# TRL 1.17.1 requires vllm >=0.22,<0.33 and transformers >=4.56.2 (lock: vllm 0.30.0, transformers 5.17.0).
+trl==1.17.1
+peft>=0.21.0
+accelerate>=1.11.0

@@ -92,6 +92,30 @@ python scripts/check_rl_reward.py --rollouts_resp outputs/rl_rollout/rollouts_re
     --ids data/rl/train_noA.jsonl --penalties 0 0.25 0.5 1   # 롤아웃 판정 재현 + 패널티별 '신호 없는 그룹' 비율
 ```
 
+## 7. GRPO 학습 (`train_grpo.py`, TRL `GRPOTrainer` + LoRA)
+평가와 같은 것: 프롬프트(평가 채팅 템플릿과 문자열 비교), 이미지 해상도(평가와 같은 `qwen_vl_utils` 리사이즈를 미리 적용),
+채점(`rl_reward.py`), 모델 revision. 일부러 다른 것: 샘플링(기본 temperature 1.0, top_p 1.0, top_k 0, 패널티 없음),
+최대 응답 8192토큰. LoRA는 LLM 디코더의 모든 linear(`train_ft.LORA_TARGET`), rank 16, lr 1e-5, ViT·merger는 동결.
+
+환경: 평가 환경에 TRL/PEFT만 추가해요. `requirements.lock.txt`를 제약으로 걸어 torch·vLLM·transformers가 평가 버전 그대로 유지돼요.
+```bash
+uv pip install -r requirements.rl.txt -c requirements.lock.txt
+```
+서버에서는 `server/rl_train_setup.sh`가 환경 → 다운로드 → CPU 검사 → 파일럿 20스텝 → 요약까지 해요(`data/rl`은 맥에서 scp로 먼저 올리기).
+```bash
+python scripts/test_train_grpo.py                 # CPU: 리사이즈, 데이터 행, GRPO/LoRA 설정
+python scripts/train_grpo.py --check_only          # 실제 프로세서로 프롬프트·이미지 일치, 최장 프롬프트 길이
+python scripts/train_grpo.py --output_dir outputs/grpo/pilot --max_steps 20
+python scripts/train_grpo.py --output_dir outputs/grpo/run1          # 같은 명령으로 다시 실행하면 마지막 체크포인트에서 이어감
+python scripts/merge_lora.py --adapter outputs/grpo/run1/checkpoint-XXX --out outputs/grpo/run1/merged_XXX
+bash scripts/run_mmmu_eval.sh --model_path outputs/grpo/run1/merged_XXX --model_revision '' \
+    --data_root $HF_DATA --output_dir outputs/grpo_run1_XXX_mmmu_val
+```
+- 매 스텝 `metrics.jsonl`에 `frac_reward_zero_std`(신호 없는 그룹 비율), `completions/clipped_ratio`(잘림 비율),
+  `reward_parts/*`, `step_time`, 메모리 최댓값이 쌓여요. `reward_parts/truncated`와 `clipped_ratio`가 같아야 잘림 판단이 맞는 거예요.
+- 메모리가 부족하면 `--per_device_train_batch_size 1 --gradient_accumulation_steps 32`(스텝당 32개 유지).
+- `--sampling eval`은 평가의 temperature/top_p/top_k로 비교 실험할 때만 써요(presence_penalty는 어느 쪽이든 꺼짐).
+
 ## GPU 없이 파이프라인만 테스트
 ```bash
 python scripts/rl_rollout_filter.py --data data/virl39k/sub.jsonl --image_root data/virl39k_raw --out /tmp/t.jsonl --limit 50 --dry_run
