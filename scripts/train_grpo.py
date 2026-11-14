@@ -76,6 +76,11 @@ def parse_args(argv=None):
     p.add_argument('--generation_batch_size', type=int, default=128,
                    help='completions per vLLM call (16 questions x 8); larger keeps vLLM busy past long stragglers')
     p.add_argument('--loss_type', default='dapo')
+    p.add_argument('--is_mode', default='token_truncate',
+                   choices=['token_truncate', 'token_mask', 'sequence_truncate', 'sequence_mask'],
+                   help="vLLM/trainer logprob correction (TRL vllm_importance_sampling_mode). TRL's default "
+                        "sequence_mask sums the per-token gap over the whole response, so long (looping, penalized) "
+                        "responses got masked; pilot 2 (2026-11-14): ratio mean 0.35-0.48 at gap 0.016/token")
     # vLLM (colocated on the training GPU)
     p.add_argument('--vllm_gpu_memory_utilization', type=float, default=0.35)
     p.add_argument('--vllm_max_model_length', type=int, default=None, help='default: longest prompt + max_completion')
@@ -251,6 +256,7 @@ def make_grpo_config(args, max_model_len, with_eval=False, **overrides):
         # GRPO objective: no KL, token-level (DAPO) normalization, group std scaling
         beta=0.0, loss_type=args.loss_type, scale_rewards='group',
         mask_truncated_completions=False,  # True would drop truncated samples and with them the loop signal
+        vllm_importance_sampling_mode=args.is_mode,  # clip_max: TRL default 3.0
         use_vllm=True, vllm_mode='colocate', vllm_gpu_memory_utilization=args.vllm_gpu_memory_utilization,
         vllm_max_model_length=max_model_len, vllm_enable_sleep_mode=not args.no_sleep_mode,
         remove_unused_columns=False, logging_steps=1, log_completions=True, num_completions_to_print=1,

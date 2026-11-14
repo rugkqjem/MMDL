@@ -65,6 +65,7 @@ cfg, sampling = tg.make_grpo_config(args, max_model_len=16384, **cpu)
 assert (cfg.temperature, cfg.top_p, cfg.top_k, cfg.repetition_penalty) == (1.0, 1.0, 0, 1.0)
 assert cfg.max_completion_length == 8192 and cfg.num_generations == 8 and not cfg.mask_truncated_completions
 assert cfg.beta == 0.0 and cfg.loss_type == 'dapo' and cfg.use_vllm and cfg.vllm_mode == 'colocate'
+assert cfg.vllm_importance_sampling_mode == 'token_truncate'
 assert cfg.per_device_train_batch_size * cfg.gradient_accumulation_steps == 32
 assert cfg.generation_batch_size % (cfg.num_generations * cfg.per_device_train_batch_size) == 0
 ev, _ = tg.make_grpo_config(tg.parse_args(['--sampling', 'eval']), 16384, **cpu)

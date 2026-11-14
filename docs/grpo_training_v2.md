@@ -1,7 +1,7 @@
 # GRPO 학습 준비 현황 (v2)
 
 > 2026-11-14 기준 · 브랜치 `rl-grpo` · 이전 문서 `docs/grpo_training_v1.md` (설계·설정·1차 파일럿), 데이터 현황 `docs/grpo_data_v1_status.md`  
-> 한 줄 요약: **1차 파일럿의 잘림 판정 불일치는 vLLM이 이미지 토큰을 두 번 펼친 버그 때문. 버그와 잘림 판정을 고쳤고, 다음은 같은 설정으로 20스텝 재파일럿.**
+> 한 줄 요약: **1차 파일럿의 잘림 판정 불일치는 vLLM이 이미지 토큰을 두 번 펼친 버그 때문. 버그와 잘림 판정을 고쳤고, 재파일럿에서 IS 가중치가 낮아 `token_truncate`로 바꿔 20스텝 재파일럿.**
 
 설계와 학습 설정은 v1의 2·4절과 같음. 이 문서는 문제, 원인, 수정, 재실행만 정리함.
 
@@ -74,7 +74,20 @@ TRL은 vLLM과 트레이너의 확률 차이를 "트레이너 확률 ÷ vLLM 확
 |---|---:|---:|---:|---:|---:|
 | 가중치 평균 | 0.005 | 0.051 | 0.028 | 0.0 | 0.0002 |
 
-→ v1 9.2절의 보상 상승(0.293 → 0.461)은 학습 효과가 아니라 스텝마다 다른 문제가 나온 데서 생긴 흔들림으로 봐야 함. 확률 차이의 원인이 2.2일 수 있어서 **IS 모드는 이번에 바꾸지 않음**.
+→ v1 9.2절의 보상 상승(0.293 → 0.461)은 학습 효과가 아니라 스텝마다 다른 문제가 나온 데서 생긴 흔들림으로 봐야 함. 확률 차이의 원인이 2.2일 수 있어서 IS 모드는 일단 그대로 두고 재파일럿함 → 2.5절 결과를 보고 `token_truncate`로 변경.
+
+### 2.5 재파일럿 1회차 (`sequence_mask`, 2026-11-14, 9스텝에서 중단)
+
+| 스텝 | 잘림 (clipped = truncated) | 8192 전 끊김 | 확률 차이 평균 | IS 가중치 평균 | grad_norm |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 0.086 | 0 | 0.016 | 0.48 | 0.032 |
+| 5 | 0.305 | 0 | 0.015 | 0.35 | 0.014 |
+| 9 | 0.117 | 0 | 0.017 | 0.37 | 0.013 |
+
+- 이미지 중복 버그는 해결됨: vLLM 프롬프트 검사 통과, 잘림 두 값 일치, 확률 차이 0.05 → 0.016, grad_norm 약 300배
+- IS 가중치는 0.35~0.48에서 더 오르지 않음. 남은 확률 차이(토큰당 0.016)는 vLLM과 트레이너의 계산 차이로 보이며 학습해도 줄지 않음
+- `sequence_mask`는 이 차이를 응답 전체에서 **합산**해 가중치가 3을 넘으면 응답을 통째로 버림 → 길수록 버려지기 쉬움. 잘림 감점을 받는 루프 응답(8192토큰)이 가장 많이 빠져서, 루프를 줄이는 신호가 가장 약해짐 (응답별 가중치가 로그에 없어서 추정)
+- → `token_truncate`로 변경: 토큰마다 계산하고 3에서 자르기만 함. 길이와 상관없이 반영됨
 
 ## 3. 수정한 것
 
@@ -82,6 +95,7 @@ TRL은 vLLM과 트레이너의 확률 차이를 "트레이너 확률 ÷ vLLM 확
 |---|---|
 | `scripts/rl_reward.py` | `is_truncated`: 길이 무관, **마지막 토큰이 EOS/pad가 아니면 잘림** (TRL과 같은 규칙). `trl_stop_ids()`로 TRL과 같은 종료 토큰 목록을 사용함 |
 | `scripts/train_grpo.py` | vLLM에 넘기기 직전에 `<|image_pad|>` N개를 이미지당 1개로 줄임 → vLLM이 한 번만 펼침. 생성 후 vLLM 프롬프트와 트레이너 프롬프트가 토큰 단위로 같은지 확인하고, 다르면 에러를 냄. `--check_only`에 "pad 묶음 수 = 이미지 수" 검사를 추가함 |
+| `scripts/train_grpo.py` (2.5절 후) | `--is_mode` 인자 추가, 기본값 `token_truncate` (TRL 기본값은 `sequence_mask`). `clip_max`는 TRL 기본값 3.0 |
 | `scripts/test_rl_reward.py` | 새 잘림 규칙 테스트 |
 | `scripts/test_vllm_prompt_fix.py` (신규) | 가짜 vLLM 엔진으로 버그 재현(38 → 56토큰)과 수정 후 복원을 확인함 |
 | `server/rl_train_setup.sh` | 새 테스트 추가. `PILOT_NAME`으로 출력 폴더를 지정함(기존 파일럿이 있으면 중단). 요약에 스텝별 잘림 두 값, IS 가중치, 확률 차이를 추가함 |
@@ -101,10 +115,13 @@ TRL은 vLLM과 트레이너의 확률 차이를 "트레이너 확률 ÷ vLLM 확
 git push origin rl-grpo
 
 # 1) (서버) 재파일럿 20스텝. 새 출력 폴더를 씀 (1차 결과 outputs/grpo/pilot_train은 보존)
-cd <WS>/MMDL
+# 셋업 스크립트는 1단계에서 git pull로 자기 자신을 바꿔도 이미 연 이전 버전으로 끝까지 돎. 먼저 pull할 것
+cd <WS>/MMDL && git pull --ff-only
 WS=<WS> PILOT_NAME=pilot2_train nohup bash server/rl_train_setup.sh > rl_train_setup2.log 2>&1 &
 
-# 2) 6절을 통과하면 전체 학습 (다시 실행하면 이어서 학습)
+# 2) 6절을 통과하면 전체 학습. 파일럿 체크포인트(checkpoint-20)를 run1로 옮기면 21스텝부터 이어서 학습함
+#    (설정이 같고 lr이 상수라 이어가도 됨. transformers가 max_steps를 새 실행 값으로 다시 잡음)
+mkdir -p outputs/grpo/run1 && cp -r outputs/grpo/pilot2_train/checkpoint-20 outputs/grpo/run1/
 nohup python scripts/train_grpo.py --output_dir outputs/grpo/run1 > grpo_run1.log 2>&1 &
 
 # 3) 체크포인트 평가
@@ -128,7 +145,8 @@ bash scripts/run_mmmu_eval.sh --model_path outputs/grpo/run1/merged_XXX --model_
 | `clipped_ratio` = `reward_parts/truncated` | 3/5 스텝 불일치 | 모든 스텝 일치 | 잘림 판정 재확인 |
 | 8192 전에 같은 길이로 끊긴 응답 | 11개 | 0개 | 프롬프트 수정 재확인 |
 | `sampling_logp_difference/mean` | 0.05 | 크게 감소 (≤ 0.01 기대) | 프롬프트 외 불일치 원인 조사 |
-| `importance_sampling_ratio/mean` | 0.0~0.05 | ≈ 1 | IS 모드를 `token_truncate`(토큰 단위, 3에서 자름)로 바꾸는 것 검토. `train_grpo.py`에 인자 추가 필요 |
+| `importance_sampling_ratio/mean` | 0.0~0.05 (재파일럿 1회차 0.35~0.48) | `token_truncate`에서는 토큰 평균이라 원래 ≈ 1. 판단 기준으로 쓰지 않음 | — |
+| 잘림·길이 추세 | — | 스텝이 지날수록 `clipped_ratio`, `mean_length`가 줄어드는지 (같은 시드라 1차와 같은 스텝끼리 같은 문제) | 패널티·IS 설정 재검토 |
 | `grad_norm` | 1e-5 수준 | 1차보다 확실히 큼 | IS 항목과 같이 봄 |
 | `frac_reward_zero_std` | 0.175 | 1차 이하 | |
 | `max_mem_gb` | 52.2GB | < 80GB | `EXTRA`로 배치 축소 |
