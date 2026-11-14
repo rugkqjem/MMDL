@@ -4,7 +4,7 @@ Scoring is not re-implemented: extract_final_answer() + score_qwen() from score.
 resample_wrong.is_correct(), the primary MMMU metric. test_rl_reward.py asserts the two agree.
 
 Reward per completion (truncation is checked BEFORE scoring):
-    truncated (hit max_completion_length without EOS)  -> -trunc_penalty
+    truncated (last token is not a stop token)         -> -trunc_penalty
     finished and correct                               ->  1.0
     finished and wrong / unparsable                    ->  0.0
 A truncated response that already wrote "answer is (B)" mid-loop still gets the penalty; in the pilot rollouts
@@ -13,12 +13,16 @@ A truncated response that already wrote "answer is (B)" mid-loop still gets the 
 Multiple-choice only. score_qwen() grades open questions by "prediction contains the gold string" ("13" matches
 gold "3"), a reward hack in RL, so rows without options raise instead of being scored silently.
 
+Truncation = TRL's own definition (trl 1.17 grpo_trainer: `completions/clipped_ratio`, mask_truncated_completions):
+the last completion token is not in eos_token_ids + [pad_token_id], whatever the length. vLLM also stops short of
+max_completion_length when prompt + completion reaches max_model_len (finish_reason 'length'); a length test
+(len >= max_completion_length) missed those and scored them as finished (pilot 2026-11-13: 11 of 640).
+
 Use with TRL (the dataset needs `answer` and `options` columns; TRL passes every column except `prompt`):
-    from rl_reward import make_reward_func
-    reward = make_reward_func(max_completion_length=8192, eos_ids=eos_ids, trunc_penalty=0.5)
-    GRPOTrainer(..., reward_funcs=reward, args=GRPOConfig(max_completion_length=8192,
-                mask_truncated_completions=False, ...))   # False: masking would drop the loop signal
-eos_ids: every id generation stops on (model.generation_config.eos_token_id, a list for Qwen3-VL).
+    from rl_reward import make_reward_func, trl_stop_ids
+    reward = make_reward_func(trl_stop_ids(processor.tokenizer, model.generation_config), trunc_penalty=0.5)
+    GRPOTrainer(..., reward_funcs=reward, args=GRPOConfig(mask_truncated_completions=False, ...))
+    # False: masking would drop the loop signal
 """
 import os
 import sys
@@ -29,12 +33,20 @@ from score import extract_final_answer, score_qwen  # noqa: E402
 DEFAULT_TRUNC_PENALTY = 0.5
 
 
-def is_truncated(completion_ids, max_completion_length, eos_ids):
-    """Cut off by the length limit: reached max_completion_length and the last token is not an EOS.
-    Works whether or not the trainer keeps the EOS token in completion_ids (a shorter completion always stopped)."""
-    if len(completion_ids) < max_completion_length:
-        return False
-    return not (completion_ids and completion_ids[-1] in eos_ids)
+def trl_stop_ids(tokenizer, generation_config):
+    """The ids TRL counts as a proper end: generation_config.eos_token_id (+ tokenizer EOS) and the pad token.
+    Mirrors GRPOTrainer.eos_token_ids and the `eos_and_pad` list of its clipped_ratio."""
+    eos = generation_config.eos_token_id
+    eos = [] if eos is None else [eos] if isinstance(eos, int) else list(eos)
+    ids = set(eos) | {tokenizer.eos_token_id, tokenizer.pad_token_id}
+    ids.discard(None)
+    return ids
+
+
+def is_truncated(completion_ids, stop_ids):
+    """TRL's definition: the completion did not end on a stop token (vLLM keeps the stop token in its output).
+    Covers both cut-offs: max_completion_length and max_model_len (prompt + completion)."""
+    return not (len(completion_ids) and int(completion_ids[-1]) in stop_ids)
 
 
 def score_response(response, answer, options, truncated, trunc_penalty=DEFAULT_TRUNC_PENALTY):
@@ -67,14 +79,14 @@ def _text(completion):
     return content
 
 
-def make_reward_func(max_completion_length, eos_ids, trunc_penalty=DEFAULT_TRUNC_PENALTY):
+def make_reward_func(stop_ids, trunc_penalty=DEFAULT_TRUNC_PENALTY):
     """TRL GRPOTrainer reward function. Logs accuracy / truncation / parse-failure rates per generation batch."""
-    eos_ids = set([eos_ids] if isinstance(eos_ids, int) else eos_ids)
-    if not eos_ids:
-        raise ValueError('eos_ids is empty')
+    stop_ids = set([stop_ids] if isinstance(stop_ids, int) else stop_ids)
+    if not stop_ids:
+        raise ValueError('stop_ids is empty')
 
     def mmmu_reward(completions, completion_ids, answer, options, log_metric=None, log_extra=None, **kwargs):
-        out = [score_response(_text(c), a, o, is_truncated(ids, max_completion_length, eos_ids), trunc_penalty)
+        out = [score_response(_text(c), a, o, is_truncated(ids, stop_ids), trunc_penalty)
                for c, ids, a, o in zip(completions, completion_ids, answer, options)]
         n = max(len(out), 1)
         if log_metric:

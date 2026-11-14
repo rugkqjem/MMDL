@@ -4,17 +4,28 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from resample_wrong import is_correct
-from rl_reward import is_truncated, make_reward_func, score_response
+from types import SimpleNamespace
+
+from rl_reward import is_truncated, make_reward_func, score_response, trl_stop_ids
 
 EOS = {151645, 151643}
 MAX = 8
 opts = ['x', 'y', 'z', 'w']
 
-# truncation: only "hit the limit without EOS" counts
-assert not is_truncated([1, 2, 3], MAX, EOS)                       # stopped early (EOS kept or stripped)
-assert not is_truncated([1] * 7 + [151645], MAX, EOS)              # EOS exactly at the limit
-assert is_truncated([1] * 8, MAX, EOS)                             # cut off
-assert is_truncated([1] * 9, MAX, EOS)
+# truncation = TRL clipped_ratio: last token not in eos + pad, whatever the length
+assert not is_truncated([1, 2, 151645], EOS)                       # stopped early on EOS
+assert not is_truncated([1] * 7 + [151645], EOS)                   # EOS exactly at the limit
+assert not is_truncated([1, 151643], EOS)                          # <|endoftext|> (eos and pad)
+assert is_truncated([1] * MAX, EOS)                                # cut off at max_completion_length
+assert is_truncated([1, 2, 3], EOS)                                # cut off early by vLLM max_model_len (pilot)
+assert is_truncated([], EOS)
+import numpy as np
+assert not is_truncated(np.array([1, 151645]), EOS) and is_truncated(np.array([1, 2]), EOS)
+
+# stop ids = TRL's eos_token_ids + pad (Qwen3-VL: generation_config [151645, 151643], pad 151643)
+tok = SimpleNamespace(eos_token_id=151645, pad_token_id=151643)
+assert trl_stop_ids(tok, SimpleNamespace(eos_token_id=[151645, 151643])) == EOS
+assert trl_stop_ids(SimpleNamespace(eos_token_id=2, pad_token_id=None), SimpleNamespace(eos_token_id=7)) == {2, 7}
 
 # reward levels; truncation decided before scoring
 ok, bad = 'Step by step...\nThe answer is (B).', 'Step by step...\nThe answer is (C).'
@@ -41,12 +52,12 @@ except ValueError:
 
 # TRL-style call: standard and conversational completions, extra kwargs ignored, metrics logged
 logged = {}
-f = make_reward_func(MAX, EOS, trunc_penalty=0.5)
-rewards = f(completions=[ok, [{'role': 'assistant', 'content': bad}], ok],
-            completion_ids=[[1, 151645], [1, 2, 151645], [1] * MAX],
-            answer=['B', 'B', 'B'], options=[opts, opts, opts], prompts=['p'] * 3, trainer_state=None,
-            question_type=['multiple-choice'] * 3, log_metric=lambda k, v: logged.__setitem__(k, v))
-assert rewards == [1.0, 0.0, -0.5], rewards
-assert abs(logged['reward_parts/truncated'] - 1 / 3) < 1e-9 and abs(logged['reward_parts/correct_eval'] - 2 / 3) < 1e-9
+f = make_reward_func(EOS, trunc_penalty=0.5)
+rewards = f(completions=[ok, [{'role': 'assistant', 'content': bad}], ok, ok],
+            completion_ids=[[1, 151645], [1, 2, 151645], [1] * MAX, [1, 2, 3]],
+            answer=['B'] * 4, options=[opts] * 4, prompts=['p'] * 4, trainer_state=None,
+            question_type=['multiple-choice'] * 4, log_metric=lambda k, v: logged.__setitem__(k, v))
+assert rewards == [1.0, 0.0, -0.5, -0.5], rewards                  # 4th: cut short, answer written -> still penalty
+assert abs(logged['reward_parts/truncated'] - 2 / 4) < 1e-9 and abs(logged['reward_parts/correct_eval'] - 3 / 4) < 1e-9
 assert f.__name__ == 'mmmu_reward'
 print('rl_reward OK')

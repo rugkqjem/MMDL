@@ -8,7 +8,8 @@
 #   scp -r ~/Desktop/MMMU/MMDL/data/rl <user>@<host>:<WS>/MMDL/data/
 #   WS=<WS> nohup bash server/rl_train_setup.sh > rl_train_setup.log 2>&1 &   tail -f rl_train_setup.log
 # Re-running is safe: finished steps are skipped. Knobs (env vars): WS (work dir, default /workspace), BRANCH, PILOT_STEPS, SAMPLING (train|eval),
-#   TRUNC_PENALTY, EXTRA (more train_grpo.py args, e.g. "--per_device_train_batch_size 1 --gradient_accumulation_steps 32")
+#   TRUNC_PENALTY, PILOT_NAME (output dir under outputs/grpo, default pilot_$SAMPLING; must not hold an earlier pilot),
+#   EXTRA (more train_grpo.py args, e.g. "--per_device_train_batch_size 1 --gradient_accumulation_steps 32")
 set -euo pipefail
 
 WS=${WS:-/workspace}
@@ -19,6 +20,7 @@ PILOT_STEPS=${PILOT_STEPS:-20}
 SAMPLING=${SAMPLING:-train}
 TRUNC_PENALTY=${TRUNC_PENALTY:-0.5}
 EXTRA=${EXTRA:-}
+PILOT_NAME=${PILOT_NAME:-pilot_${SAMPLING}}
 MODEL_REVISION=ebb281ec70b05090aa6165b016eac8ec08e71b17  # infer.py MODEL_REVISION
 
 export HF_HOME=$WS/hf_home
@@ -74,23 +76,33 @@ python scripts/test_score.py
 python scripts/test_rl_reward.py
 python scripts/check_rl_reward.py --mmmu
 python scripts/test_train_grpo.py
+python scripts/test_vllm_prompt_fix.py
 python scripts/train_grpo.py --check_only --sampling $SAMPLING --trunc_penalty $TRUNC_PENALTY $EXTRA
 
 step "5. pilot GRPO ($PILOT_STEPS optimizer steps, sampling $SAMPLING, trunc_penalty $TRUNC_PENALTY)"
-PILOT=outputs/grpo/pilot_${SAMPLING}
+PILOT=outputs/grpo/$PILOT_NAME
+# metrics.jsonl is appended to: an earlier pilot in the same dir would be mixed into the summary
+[[ ! -e $PILOT/metrics.jsonl ]] || { echo "$PILOT already has a pilot: set PILOT_NAME (e.g. pilot2_${SAMPLING})"; exit 1; }
 python scripts/train_grpo.py --output_dir $PILOT --max_steps $PILOT_STEPS --save_steps 1000 \
   --sampling $SAMPLING --trunc_penalty $TRUNC_PENALTY $EXTRA
 
 step "6. pilot summary"
 python - "$PILOT/metrics.jsonl" <<'EOF'
 import json, sys
-rows = [r for r in map(json.loads, open(sys.argv[1])) if 'reward' in r]
-def avg(k): v = [r[k] for r in rows if k in r]; return sum(v) / len(v) if v else float('nan')
+allrows = list(map(json.loads, open(sys.argv[1])))
+rows = [r for r in allrows if 'reward' in r]
+def avg(k, rs=None): v = [r[k] for r in (rs or rows) if k in r]; return sum(v) / len(v) if v else float('nan')
 print(f"steps logged {len(rows)} | reward {avg('reward'):.3f} | frac_reward_zero_std {avg('frac_reward_zero_std'):.3f} "
       f"(offline baseline at eval sampling: 0.000 with any penalty > 0)")
 print(f"clipped_ratio {avg('completions/clipped_ratio'):.3f} (eval sampling rollouts: 0.168) | "
-      f"mean length {avg('completions/mean_length'):.0f} | step_time {avg('step_time'):.0f}s | "
-      f"peak mem {max(r.get('max_mem_gb', 0) for r in rows):.1f} GB")
+      f"mean length {avg('completions/mean_length'):.0f} | step_time {avg('step_time', allrows):.0f}s (all steps) | "
+      f"peak mem {max(r.get('max_mem_gb', 0) for r in allrows):.1f} GB")
+print('step  clipped  reward_truncated  IS_ratio  logp_diff  (clipped must equal reward_truncated; IS_ratio ~1)')
+for r in rows:
+    print(f"{r['step']:>4}  {r.get('completions/clipped_ratio', float('nan')):7.3f}  "
+          f"{r.get('reward_parts/truncated', float('nan')):16.3f}  "
+          f"{r.get('sampling/importance_sampling_ratio/mean', float('nan')):8.3f}  "
+          f"{r.get('sampling/sampling_logp_difference/mean', float('nan')):9.3f}")
 print(f"first -> last reward: {rows[0]['reward']:.3f} -> {rows[-1]['reward']:.3f}")
 EOF
 echo

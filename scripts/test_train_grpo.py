@@ -53,9 +53,9 @@ except ValueError:
     pass
 
 # 3) reward reads the dataset columns as TRL passes them
-f = make_reward_func(8, {151645, 151643})
+f = make_reward_func({151645, 151643})
 assert f(completions=['The answer is (B).', 'The answer is (C).', 'The answer is (B).'],
-         completion_ids=[[1, 151645], [1, 151645], [1] * 8], answer=ds['answer'], options=ds['options']) \
+         completion_ids=[[1, 151645], [1, 151645], [1, 2]], answer=ds['answer'], options=ds['options']) \
     == [1.0, 0.0, -0.5]
 
 # 4) GRPO config: values that decide what is learned

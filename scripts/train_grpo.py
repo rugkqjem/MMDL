@@ -4,9 +4,17 @@ Same as the MMMU eval, so the reward optimizes the reported metric:
   - prompt: the `prompt` field of data/rl/*.jsonl came from infer.build_messages(); images go before the text
   - image resolution: every image is resized here with qwen_vl_utils exactly as infer.prepare_sample() does
     (infer.py min/max pixels), so the trainer's processor and vLLM receive eval-sized images and leave them as is
-  - scoring: rl_reward.py (extract_final_answer + score_qwen) with a truncation penalty
+  - scoring: rl_reward.py (extract_final_answer + score_qwen) with a truncation penalty; truncation = TRL's own
+    clipped_ratio rule (last token not EOS/pad), so it also catches cut-offs by vLLM max_model_len
   - weights: the pinned revision (infer.MODEL_REVISION), one local snapshot shared by the trainer and vLLM
 --check_only verifies prompt and image parity with the real processor before any GPU work.
+
+vLLM prompt fix (install_vllm_prompt_fix): TRL tokenizes the prompt with the processor, so every image is already
+expanded to N <|image_pad|> tokens, then hands those ids AND the images to vLLM. vLLM 0.30 expands again, taking
+each existing pad as one image placeholder: the prompt grew to ~2x its image tokens with the image features out of
+order, and long multi-image prompts hit max_model_len mid-answer (pilot 2026-11-13: cut at 3,198 / 5,403 / 7,384
+tokens). The fix collapses each pad run to one pad before vLLM, so vLLM expands once, and checks that the prompt
+vLLM actually ran is token for token the trainer's prompt.
 
 Deliberately different from the eval:
   - sampling (--sampling train, default): temperature 1.0, top_p 1.0, top_k 0, no presence/repetition penalty.
@@ -36,7 +44,7 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import infer  # noqa: E402
-from rl_reward import DEFAULT_TRUNC_PENALTY, make_reward_func  # noqa: E402
+from rl_reward import DEFAULT_TRUNC_PENALTY, make_reward_func, trl_stop_ids  # noqa: E402
 
 EVAL = infer.parse_args(['--output', os.devnull])  # eval defaults: pixels, sampling recipe, model revision
 
@@ -129,6 +137,7 @@ def build_dataset(rows, image_root, patch_size):
 def check_parity(processor, rows, ds):
     """Chat-template text identical to the eval's, processor does not resize again, prompt token lengths."""
     ps, merge = processor.image_processor.patch_size, processor.image_processor.merge_size
+    pad = processor.tokenizer.convert_tokens_to_ids('<|image_pad|>')
     longest = 0
     for i, r in enumerate(rows):
         imgs = ds[i]['images']
@@ -140,19 +149,83 @@ def check_parity(processor, rows, ds):
         for im, thw in zip(imgs, enc['image_grid_thw']):
             w, h = im.size
             assert [int(x) for x in thw] == [1, h // ps, w // ps], f"{r['id']}: processor resized {im.size} -> grid {thw.tolist()}"
-        longest = max(longest, enc['input_ids'].shape[1])
+        ids = enc['input_ids'][0].tolist()
+        n_pad = sum(int(t[1] * t[2]) // merge ** 2 for t in enc['image_grid_thw'])
+        assert ids.count(pad) == n_pad and collapse_image_pads(ids, pad).count(pad) == len(imgs), \
+            f"{r['id']}: image pad runs do not map one to one onto images (vLLM prompt fix)"
+        longest = max(longest, len(ids))
     print(f'[check] {len(rows)} rows: chat template == eval, no second resize '
-          f'(patch {ps}, merge {merge}), longest prompt {longest} tokens')
+          f'(patch {ps}, merge {merge}), one pad run per image, longest prompt {longest} tokens')
     return longest
 
 
-def check_reward(reward, ds, max_len, eos_ids):
+def check_reward(reward, ds, max_len, stop_ids):
     a, o = ds[0]['answer'], ds[0]['options']
-    eos = sorted(eos_ids)[0]
-    got = reward(completions=[f'The answer is ({a}).', 'The answer is (Z).', f'The answer is ({a}).'],
-                 completion_ids=[[1, eos], [1, eos], [1] * max_len], answer=[a] * 3, options=[o] * 3)
-    assert got[0] == 1.0 and got[1] == 0.0 and got[2] < 0, got
-    print(f'[check] reward wiring: correct {got[0]}, wrong {got[1]}, truncated {got[2]}')
+    eos = sorted(stop_ids)[0]
+    got = reward(completions=[f'The answer is ({a}).', 'The answer is (Z).', f'The answer is ({a}).',
+                              f'The answer is ({a}).'],
+                 completion_ids=[[1, eos], [1, eos], [1] * max_len, [1, 2]], answer=[a] * 4, options=[o] * 4)
+    assert got[0] == 1.0 and got[1] == 0.0 and got[2] < 0 and got[3] < 0, got
+    print(f'[check] reward wiring: correct {got[0]}, wrong {got[1]}, truncated {got[2]}, cut short {got[3]}')
+
+
+# ----------------------------------------------------------------------------- vLLM prompt fix
+def collapse_image_pads(ids, pad_id):
+    """[..., <|vision_start|>, pad x N, <|vision_end|>, ...] -> one pad per image, the form vLLM expands itself."""
+    out = []
+    for t in ids:
+        t = int(t)
+        if not (t == pad_id and out and out[-1] == pad_id):
+            out.append(t)
+    return out
+
+
+def make_vllm_prompt_fix(generate, pad_id, log=print):
+    """Wrap vllm.LLM.generate: multimodal prompts go in with one pad per image, and each output's prompt_token_ids
+    (the prompt vLLM really ran, after its own expansion) must equal the trainer's ids, else RuntimeError."""
+    warned = []
+
+    def fixed_generate(prompts, *args, **kwargs):
+        sent, expected = [], []
+        for p in prompts:
+            if isinstance(p, dict) and p.get('multi_modal_data') and 'prompt_token_ids' in p:
+                ids = [int(t) for t in p['prompt_token_ids']]
+                short = collapse_image_pads(ids, pad_id)
+                imgs = p['multi_modal_data'].get('image')
+                n_img = len(imgs) if isinstance(imgs, (list, tuple)) else int(imgs is not None)
+                if short.count(pad_id) != n_img:
+                    raise ValueError(f'{short.count(pad_id)} image placeholder runs for {n_img} images')
+                p = {**p, 'prompt_token_ids': short}
+                expected.append((ids, short))
+            else:
+                expected.append(None)
+            sent.append(p)
+        outputs = generate(sent, *args, **kwargs)
+        for i, (out, exp) in enumerate(zip(outputs, expected)):
+            if exp is None:
+                continue
+            got = [int(t) for t in out.prompt_token_ids]
+            if got == exp[0]:
+                continue
+            if got == exp[1]:  # vLLM reported the unexpanded prompt: nothing to compare against
+                if not warned:
+                    log('[vllm-fix] WARNING: vLLM returned the unexpanded prompt; prompt parity not verified')
+                    warned.append(True)
+                continue
+            raise RuntimeError(f'vLLM prompt {i} is {len(got)} tokens, the trainer prompt {len(exp[0])}: '
+                               f'image tokens expanded differently')
+        return outputs
+
+    fixed_generate.vllm_prompt_fix = True
+    return fixed_generate
+
+
+def install_vllm_prompt_fix(trainer, pad_id):
+    llm = getattr(getattr(trainer, 'vllm_generation', None), 'llm', None)
+    if llm is None:
+        raise RuntimeError('colocated vLLM engine not found (trainer.vllm_generation.llm); the prompt fix needs '
+                           'vllm_mode=colocate')
+    llm.generate = make_vllm_prompt_fix(llm.generate, pad_id)
 
 
 # ----------------------------------------------------------------------------- configs
@@ -204,19 +277,20 @@ def main(argv=None):
     processor = AutoProcessor.from_pretrained(model_dir)
     processor.image_processor.size = {'shortest_edge': EVAL.min_pixels, 'longest_edge': EVAL.max_pixels}
     processor.tokenizer.padding_side = 'left'  # GRPOTrainer requirement
-    eos_ids = GenerationConfig.from_pretrained(model_dir).eos_token_id
-    eos_ids = set([eos_ids] if isinstance(eos_ids, int) else eos_ids)
-    reward = make_reward_func(args.max_completion_length, eos_ids, args.trunc_penalty)
+    stop_ids = trl_stop_ids(processor.tokenizer, GenerationConfig.from_pretrained(model_dir))
+    reward = make_reward_func(stop_ids, args.trunc_penalty)
+    image_pad_id = processor.tokenizer.convert_tokens_to_ids('<|image_pad|>')
 
     rows = load_rows(args.train, args.limit)
     ds = build_dataset(rows, args.image_root, processor.image_processor.patch_size)
     longest = check_parity(processor, rows, ds)
-    check_reward(reward, ds, args.max_completion_length, eos_ids)
+    check_reward(reward, ds, args.max_completion_length, stop_ids)
     max_model_len = args.vllm_max_model_length or longest + args.max_completion_length + 64
     if longest + args.max_completion_length > max_model_len:
         sys.exit(f'vllm_max_model_length {max_model_len} < longest prompt {longest} + {args.max_completion_length}')
     if args.check_only:
-        print(f'[check] OK. vllm_max_model_length would be {max_model_len}; eos ids {sorted(eos_ids)}')
+        print(f'[check] OK. vllm_max_model_length would be {max_model_len}; stop ids {sorted(stop_ids)}; '
+              f'image pad id {image_pad_id}')
         return
 
     import torch
@@ -247,13 +321,14 @@ def main(argv=None):
 
     trainer = GRPOTrainer(model=model_dir, reward_funcs=reward, args=config, train_dataset=ds, eval_dataset=val,
                           processing_class=processor, peft_config=lora, callbacks=[MetricsLog()])
+    install_vllm_prompt_fix(trainer, image_pad_id)
     lora_mods = [n for n, _ in trainer.model.named_modules() if n.endswith('lora_A')]
     assert lora_mods and not any('visual' in n for n in lora_mods), 'LoRA must stay on the LLM decoder'
     n_train = sum(p.numel() for p in trainer.model.parameters() if p.requires_grad)
     print(f'[lora] {len(lora_mods)} adapted linears, {n_train:,} trainable params; sampling {sampling}; '
-          f'trunc_penalty {args.trunc_penalty}; vllm_max_model_length {max_model_len}', flush=True)
+          f'trunc_penalty {args.trunc_penalty}; vllm_max_model_length {max_model_len}; vLLM prompt fix on', flush=True)
     with open(os.path.join(args.output_dir, 'run_args.json'), 'w') as f:
-        json.dump(vars(args) | {'model_dir': model_dir, 'sampling_params': sampling, 'eos_ids': sorted(eos_ids),
+        json.dump(vars(args) | {'model_dir': model_dir, 'sampling_params': sampling, 'stop_ids': sorted(stop_ids),
                                 'vllm_max_model_length': max_model_len, 'lora_target': LORA_TARGET}, f, indent=2)
     trainer.train(resume_from_checkpoint=any(d.startswith('checkpoint-') for d in os.listdir(args.output_dir)))
     trainer.save_model(os.path.join(args.output_dir, 'final_adapter'))
