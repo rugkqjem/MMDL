@@ -5,3 +5,5 @@ outputs/decontam/*.pkl
 rl_results/
 outputs/rl_rollout/
 outputs/decontam/virl/
+outputs/dpo/
+outputs/loop_gold/

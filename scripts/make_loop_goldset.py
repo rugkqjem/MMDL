@@ -30,13 +30,15 @@ from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from classify_errors import repeated_line_ratio, zlib_ratio  # noqa: E402
 
-LOOP_TYPES = [
-    ('A1', 'A1 · 계산값이 보기와 안 맞아 결론 못 냄'),
-    ('A2', 'A2 · 계산값이 보기와 안 맞아 결론 못 냄'),
-    ('C', 'C · 반복을 그 자리에서 끊지 못함 (디코딩 습관)'),
-    ('F', 'F · 반복을 그 자리에서 끊지 못함 (디코딩 습관)'),
-    ('E', 'E · 이미지를 못 읽거나 확신이 없음'),
-    ('D', 'D · 이미지를 못 읽거나 확신이 없음'),
+LOOP_TYPES = [  # taxonomy of the 85 truncated MMMU baseline responses (team analysis)
+    ('A1', 'A1 · "보기에 없다"를 직접 되풀이'),
+    ('A2', 'A2 · 문제 조건·그림 해석을 바꿔 가며 다시 가정'),
+    ('B', 'B · "정보가 부족하다"를 반복'),
+    ('C', 'C · 같은 계산 블록을 그대로 반복'),
+    ('D', 'D · 답을 냈다가 번복하기를 반복'),
+    ('E', 'E · 이미지 판독 재시도'),
+    ('F', 'F · 토큰 붕괴 (0000…, b → b → …)'),
+    ('G', 'G · 루프 아님: 계산을 이어가다 한도 도달'),
     ('other', '기타'),
 ]
 
@@ -165,6 +167,7 @@ label{display:block;font-size:12px;color:var(--mut);margin-top:8px}select,input,
 #resp{font:12.5px/1.5 ui-monospace,Menlo,monospace}.r{display:grid;grid-template-columns:56px 1fr;cursor:pointer;border-radius:3px}
 .r:hover{background:var(--line)}.r .n{color:var(--mut);text-align:right;padding-right:10px;user-select:none}.r .t{white-space:pre-wrap;word-break:break-all}
 .r.onset{background:var(--onset)}.r.branch{background:var(--branch)}.r.after{opacity:.55}
+input.active{outline:2px solid var(--acc)}input[readonly]{cursor:pointer}
 .dots span{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--line);margin:1px;cursor:pointer}.dots span.done{background:var(--acc)}.dots span.cur{outline:2px solid var(--fg)}
 </style></head><body>
 <header><h1>__TITLE__</h1><button id="prev">← 이전</button><span id="pos"></span><button id="next">다음 →</button>
@@ -172,8 +175,9 @@ label{display:block;font-size:12px;color:var(--mut);margin-top:8px}select,input,
 <main><aside>
  <div class="card"><div id="meta" class="mut"></div><pre class="q" id="question"></pre><div class="mut" id="gold"></div></div>
  <div class="card">
-  <div class="mut">줄을 클릭하면 아래에서 고른 표시가 찍혀요. 같은 줄을 다시 누르면 지워져요.</div>
-  <div style="display:flex;gap:6px;margin-top:6px"><button id="m_onset" class="on">반복 시작</button><button id="m_branch">갈림길 (선택)</button></div>
+  <div class="mut">먼저 무엇을 찍을지 고르고(버튼이나 아래 칸 클릭) 오른쪽 줄을 클릭하세요. 같은 줄을 다시 누르면 지워져요.</div>
+  <div style="display:flex;gap:6px;margin-top:6px;align-items:center"><button id="m_onset" class="on">반복 시작</button><button id="m_branch">갈림길 (선택)</button></div>
+  <div id="modehint" style="margin-top:6px;font-weight:600;color:var(--acc)"></div>
   <label>루프인가?</label><select id="is_loop"><option value="">—</option><option value="loop">루프 (이미 나온 내용을 다시 씀)</option><option value="no">루프 아님 (계속 새 계산)</option><option value="unsure">애매</option></select>
   <label>루프 유형</label><select id="loop_type"></select>
   <label>반복 시작 = 이미 앞에서 나온 내용이 다시 시작되는 첫 줄</label><input id="onset" readonly placeholder="줄을 클릭">
@@ -205,8 +209,10 @@ function render(){
 $('resp').addEventListener('click',e=>{const r=e.target.closest('.r');if(!r)return;const n=+r.dataset.n,off=+r.dataset.off,l=L(),k=mode+'_row';
  if(l[k]===n){delete l[k];delete l[mode+'_char']}else{l[k]=n;l[mode+'_char']=off} save(); const y=scrollY; render(); scrollTo(0,y)});
 for(const f of ['is_loop','loop_type','note']) $(f).addEventListener('input',()=>{L()[f]=$(f).value;save()});
-$('m_onset').onclick=()=>{mode='onset';$('m_onset').classList.add('on');$('m_branch').classList.remove('on')};
-$('m_branch').onclick=()=>{mode='branch';$('m_branch').classList.add('on');$('m_onset').classList.remove('on')};
+function setMode(m){mode=m;for(const x of ['onset','branch']){$('m_'+x).classList.toggle('on',x===m);$(x).classList.toggle('active',x===m)}
+ $('modehint').textContent='지금 찍는 것: '+(m==='onset'?'반복 시작 (주황)':'갈림길 (파랑)')}
+for(const x of ['onset','branch']){$('m_'+x).onclick=()=>setMode(x);$(x).onclick=()=>setMode(x)}
+setMode('onset');
 $('prev').onclick=()=>{cur=(cur+DATA.length-1)%DATA.length;render();scrollTo(0,0)};
 $('next').onclick=()=>{cur=(cur+1)%DATA.length;render();scrollTo(0,0)};
 $('dots').onclick=e=>{if(e.target.dataset.i){cur=+e.target.dataset.i;render();scrollTo(0,0)}};
