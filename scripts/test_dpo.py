@@ -91,6 +91,38 @@ try:
 except AssertionError as e:
     assert 'q1' in str(e)
 
+# ---------------------------------------------------------------- dpo_pairs: cut mode (team plan)
+assert dp.first_mismatch('so x = 31%, but 31% is not in the options. Let me redo') is not None
+assert dp.first_mismatch('None of the given choices fit.') == 0
+assert dp.first_mismatch("12 doesn't match any of the options") is not None
+assert dp.first_mismatch('Options A and B are close; the answer is (B).') is None
+loop_text = 'Reasoning step.\n' * 300 + 'The result 31 is not in the options.\n' + 'Perhaps the figure differs. Still 31.\n' * 400
+cs = [S('so the answer is (B).', 'stop', 900, 0),
+      S('I get 31, which is not among the choices, so the closest is (B). The answer is (B).', 'stop', 2000, 1),
+      S('so the answer is (C).', 'stop', 800, 2),
+      dict(S(loop_text, 'length', 8192, 3)),
+      dict(S('no mismatch words, just going on ' * 500, 'length', 8192, 4))]
+prs, sk = dp.cut_loop_pairs(q, cs, per_q=2, scope='mismatch', extra_tokens=1500, max_tokens=4095)
+assert len(prs) == 1 and prs[0]['meta']['chosen_recovered'] and prs[0]['meta']['chosen_sample'] == 1
+m = prs[0]['meta']
+assert prs[0]['prefix'] == '' and not prs[0]['rejected_eos'] and loop_text.startswith(prs[0]['rejected'])
+assert m['mismatch_char'] < len(prs[0]['rejected']) and prs[0]['rejected'].endswith('\n')
+cpt = len(loop_text) / 8192
+assert abs(m['rejected_tokens_est'] - min(max(2000, m['mismatch_char'] / cpt + 1500), 4095)) < 60, m
+prs_all, _ = dp.cut_loop_pairs(q, cs, per_q=2, scope='all', extra_tokens=1500, max_tokens=4095)
+assert len(prs_all) == 2 and prs_all[1]['meta']['chosen_sample'] == 0       # second pair uses the next chosen
+late = dict(S('x\n' * 30000 + 'not in the options\n' + 'y\n' * 100, 'length', 8192, 5))
+prs_late, sk = dp.cut_loop_pairs(q, cs[:3] + [late], 2, 'mismatch', 1500, 4095)
+assert prs_late == [] and sk == ['mismatch past cap']
+assert dp.cut_loop_pairs(q, cs[2:], 2, 'mismatch', 1500, 4095) == ([], ['no correct'])
+cut_full = [dict(prs[0], id='q1', answer='B', options=q['options'])]
+dp.check(cut_full, {'q1'}, set(), {'correct': 1, 'loop': 2})
+try:
+    dp.check([dict(cut_full[0], rejected=cut_full[0]['rejected'][:50])], {'q1'}, set(), {'correct': 1, 'loop': 2})
+    raise AssertionError('mismatch outside rejected should fail')
+except AssertionError as e:
+    assert 'mismatch not in rejected' in str(e), e
+
 # ---------------------------------------------------------------- train_dpo: text rows and config
 import train_dpo as td
 row = td.to_text_row(full[1], 'CHAT<|im_start|>assistant\n')
