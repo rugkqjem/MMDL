@@ -183,9 +183,13 @@ class SFTDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         # Skip over-long samples instead of truncating: a cut can split an image's tokens from its pixel patches.
         for k in range(len(self.rows)):
-            enc = self.encode((idx + k) % len(self.rows))
+            j = (idx + k) % len(self.rows)
+            enc = self.encode(j)
             if len(enc['input_ids']) <= self.max_length:
                 return enc
+            row = self.rows[j]   # say so: the replacement sample is seen twice this epoch
+            print(f"[train_ft] skip over-length sample {row.get('id', j)}: {len(enc['input_ids'])} tokens "
+                  f'> --max_length {self.max_length}', flush=True)
         raise ValueError(f'every sample is longer than --max_length {self.max_length}')
 
 

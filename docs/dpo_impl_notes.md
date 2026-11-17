@@ -86,20 +86,32 @@
 
 ## 서버에서 실행하기
 
-`outputs/rft/merged`는 RFT 학습 후 병합한 모델 폴더를 뜻하는 **임시 이름**이에요. 실제 경로로 바꿔서 쓰세요.
+`outputs/rft/merged`는 RFT 학습 결과 폴더예요. `train_ft.py`가 LoRA를 합친 전체 모델로 저장해서 그대로 평가와 DPO에 써요.
 
 ### 1. 데이터 받기
 
-`outputs/`와 `data/`는 git에 없어요. [1]과 [3] 결과, 롤아웃 응답, 학습셋을 묶은 압축 파일(`dpo_server_bundle_YYYYMMDD.tar.gz`)을 레포 루트에서 풀어요.
+`outputs/`와 `data/`는 git에 없어요. [1]과 [3] 결과, RFT 데이터, 롤아웃 응답, 학습셋을 묶은 압축 파일(`server_bundle_rft_dpo_YYYYMMDD.tar.gz`)을 레포 루트에서 풀어요.
 
 ```bash
-tar xzf dpo_server_bundle_YYYYMMDD.tar.gz
+tar xzf server_bundle_rft_dpo_YYYYMMDD.tar.gz
 md5sum -c outputs/dpo/MANIFEST.md5                                    # 전부 OK
 hf download TIGER-Lab/ViRL39K --repo-type dataset --local-dir data/virl39k_raw   # 이미지 (압축 파일에 없음)
 python scripts/test_dpo.py                                            # "dpo pipeline OK"
 ```
 
-### 2. v0: 승희 방식 (RFT 끝나면 바로)
+### 2. RFT
+
+RFT 데이터 = 최종 학습셋 롤아웃 중 **끝까지 쓴 정답 응답, 문제당 최대 2개** → 1,337개 / 724문제 (`scripts/make_rft_data.py`, 압축 파일에 `data/rft/rft_train.jsonl`로 들어 있음)
+
+```bash
+python scripts/train_ft.py --train_data data/rft/rft_train.jsonl --image_root data/virl39k_raw \
+  --output_dir outputs/rft/merged --lora_llm --gradient_checkpointing --max_length 12288 --save_steps 50
+bash scripts/run_mmmu_eval.sh --model_path outputs/rft/merged --model_revision ''    # DPO 비교 기준점
+```
+- `--max_length 12288`: 긴 응답 + 이미지 토큰이 8192를 넘는 샘플이 있음 (넘으면 건너뛰고 로그에 남김)
+- `--save_steps 50`: 기본값 500이면 중간 체크포인트가 안 남음 (약 170스텝)
+
+### 3. v0: 승희 방식 (RFT 끝나면 바로)
 
 ```bash
 python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_cut.jsonl --check_only
@@ -107,7 +119,7 @@ python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/
 python scripts/merge_lora.py --model_path outputs/rft/merged --adapter outputs/dpo/v0/final_adapter --out outputs/dpo/v0/merged
 ```
 
-### 3. v1: 재샘플링 방식
+### 4. v1: 재샘플링 방식
 
 ```bash
 python scripts/dpo_resample.py --model_path outputs/rft/merged --limit 20      # 20개만 먼저 (에러·시간 확인)
