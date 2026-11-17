@@ -61,9 +61,10 @@ assert dp.correct_pairs(q, samples[:1] + samples[2:], 1.5, 1) == []   # only a t
 # ---------------------------------------------------------------- dpo_pairs: loop pairs
 orig = text
 rs = {'id': 'q1', 'sample': 4, 'branch_char': len(intro),
-      'continuations': [{'text': 'Closest option is (B).\nThe answer is (B).', 'finish_reason': 'stop', 'correct': True},
-                        {'text': 'The answer is (C).', 'finish_reason': 'stop', 'correct': False},
-                        {'text': 'loop ' * 50, 'finish_reason': 'length', 'correct': False}]}
+      'continuations': [{'text': 'Closest option is (B).\nThe answer is (B).', 'finish_reason': 'stop', 'correct': True,
+                         'parsed': 'B'},
+                        {'text': 'The answer is (C).', 'finish_reason': 'stop', 'correct': False, 'parsed': 'C'},
+                        {'text': 'loop ' * 50, 'finish_reason': 'length', 'correct': False, 'parsed': None}]}
 pr = dp.loop_pair(q, rs, orig, random.Random(0), chosen_correct=False, min_rejected=300, min_share=0.5)
 assert pr['prefix'] == orig[:len(intro)] and pr['chosen'].endswith('(B).') and not pr['rejected_eos']
 assert orig[len(intro):].startswith(pr['rejected']) and pr['meta']['rejected_loop_share'] >= 0.5
@@ -71,6 +72,9 @@ assert block in pr['rejected']                                         # the rej
 early = dp.loop_pair(q, dict(rs, branch_char=200), orig, random.Random(0), False, 300, 0.5)
 assert early['meta']['rejected_loop_share'] >= 0.5 and len(early['rejected']) > len(intro) - 200   # extended into loop
 assert dp.loop_pair(q, dict(rs, branch_char=None), orig, random.Random(0), False, 300, 0.5) is None
+empty = dict(rs, continuations=[{'text': ' \n', 'finish_reason': 'stop', 'correct': True, 'parsed': 'B'},
+                                 {'text': 'I am not sure.', 'finish_reason': 'stop', 'correct': False, 'parsed': None}])
+assert dp.loop_pair(q, empty, orig, random.Random(0), False, 300, 0.5) is None   # empty / unanswered escapes
 only_wrong = dict(rs, continuations=rs['continuations'][1:])
 assert dp.loop_pair(q, only_wrong, orig, random.Random(0), True, 300, 0.5) is None
 assert dp.loop_pair(q, only_wrong, orig, random.Random(0), False, 300, 0.5)['chosen'] == 'The answer is (C).'

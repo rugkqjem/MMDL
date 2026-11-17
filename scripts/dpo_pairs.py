@@ -113,7 +113,9 @@ def loop_pair(q, rs, original, rng, chosen_correct, min_rejected, min_share, fla
     if rs['branch_char'] is None:
         return None
     b = rs['branch_char']
-    esc = [c for c in rs['continuations'] if c['finish_reason'] == 'stop']
+    # an escape must write something and end with a parsable answer: an immediate EOS right after the prefix
+    # (empty text) is not a usable chosen side
+    esc = [c for c in rs['continuations'] if c['finish_reason'] == 'stop' and c['text'].strip() and c.get('parsed')]
     pool = [c for c in esc if c['correct']] or ([] if chosen_correct else esc)
     if not pool:
         return None
