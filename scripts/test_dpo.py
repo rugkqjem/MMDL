@@ -133,8 +133,8 @@ assert row['prompt'] == 'CHAT' and row['rejected'].endswith('<|im_end|>')
 
 args = td.parse_args(['--model_path', 'x', '--output_dir', '/tmp/dpo_test'])
 cfg = td.make_dpo_config(args, bf16=False, use_cpu=True)
-assert cfg.loss_type == ['sigmoid', 'sft'] and cfg.loss_weights == [1.0, 1.0] and cfg.beta == 0.1
+assert cfg.loss_type == ['sigmoid'] and cfg.beta == 0.1 and cfg.learning_rate == 1e-5 and cfg.warmup_steps == 0.1
 assert not cfg.precompute_ref_log_probs and cfg.max_length is None and cfg.gradient_checkpointing
-cfg = td.make_dpo_config(td.parse_args(['--model_path', 'x', '--sft_weight', '0']), bf16=False, use_cpu=True)
-assert cfg.loss_type == ['sigmoid']
+cfg = td.make_dpo_config(td.parse_args(['--model_path', 'x', '--sft_weight', '1']), bf16=False, use_cpu=True)
+assert cfg.loss_type == ['sigmoid', 'sft'] and cfg.loss_weights == [1.0, 1.0]
 print('dpo pipeline OK')

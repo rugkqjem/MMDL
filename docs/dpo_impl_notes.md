@@ -73,9 +73,10 @@
   - rejected = 응답 + `<|im_end|>`(정답 쌍만). **루프 쌍은 EOS 없음**
   - TRL 1.17은 이미지 데이터셋에서 EOS를 자동으로 안 붙임 (소스 확인) → 위 문자열 그대로 학습
 - **이미지**: 평가와 같은 `qwen_vl_utils` 리사이즈를 미리 적용, 프로세서 크기를 평가 값으로 고정
-- **손실**: sigmoid DPO + chosen에 SFT 손실(가중치 1.0), beta 0.1. LD-DPO(`--ld_alpha`)는 옵션
+- **손실**: sigmoid DPO, beta 0.1. chosen에 SFT 손실을 더하는 건 옵션(`--sft_weight 1.0`, 기본 꺼짐). LD-DPO(`--ld_alpha`)도 옵션
+- 학습 설정(sft 항, lr, warmup)은 **승희 방식 문서를 따름**
 - **LoRA**: LLM 디코더 전체 linear, r16, alpha 32, vision 동결 (assert로 확인)
-- **학습**: lr 5e-6 (cosine, warmup 5%), 1에폭, 배치 1 × 누적 16, gradient checkpointing, bf16, 길이 자르지 않음
+- **학습**: lr 1e-5 (cosine, warmup 10%), 1에폭, 배치 1 × 누적 16, gradient checkpointing, bf16, 길이 자르지 않음
 - **체크포인트**: 25스텝마다. 이어서 학습해도 이번 실행의 저장 간격을 씀 (GRPO run1에서 체크포인트가 안 남았던 문제 수정)
 - **`--check_only`**: 학습 없이 이미지가 평가와 같게 들어가는지, chosen 끝에만 `<|im_end|>`가 붙는지, 가장 긴 쌍이 몇 토큰인지 출력
 - **TRL 제약**: 이미지 데이터셋은 기준 모델 확률을 미리 계산 못 함 → 매 스텝 한 번 더 계산 (시간 증가, 메모리는 모델 한 벌)
@@ -122,6 +123,5 @@ python scripts/merge_lora.py --model_path outputs/rft/merged --adapter outputs/d
 ## 열린 결정 (팀 논의)
 
 - **E·G 제외**: 승희 방식 문서는 E(판독 재시도)·G(정상적인 긴 계산)를 빼자고 함. 두 방식 모두 아직 미적용 → 승희의 "의미 밀도 4.5" 정의를 받으면 필터 추가
-- **학습 설정이 승희 방식 문서와 다른 것**: sft 항 (코드 1.0 / 문서는 기본 끄고 비교), lr (5e-6 / 1e-5), warmup (5% / 10%) → 하나로 정하기
 - **재샘플링 chosen을 정답만으로 제한할지** (`--loop_chosen_correct`): 빠져나오는 것 자체가 목표면 오답도 허용, 점수까지 노리면 정답만
 - **RFT 데이터와 DPO chosen 겹침**: RFT 데이터가 정해지면 확인

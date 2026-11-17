@@ -44,17 +44,18 @@ def parse_args(argv=None):
     p.add_argument('--limit', type=int, default=None)
     # loss
     p.add_argument('--beta', type=float, default=0.1)
-    p.add_argument('--sft_weight', type=float, default=1.0, help='weight of the SFT term on chosen (0 = plain DPO)')
+    p.add_argument('--sft_weight', type=float, default=0.0,
+                   help="weight of the SFT term on chosen (0 = plain DPO, Seunghee's plan default; try 1.0 to compare)")
     p.add_argument('--ld_alpha', type=float, default=None, help='LD-DPO length desensitization (None = off)')
     # optimization
     p.add_argument('--lora_r', type=int, default=16)
     p.add_argument('--lora_alpha', type=int, default=32)
-    p.add_argument('--learning_rate', type=float, default=5e-6)
+    p.add_argument('--learning_rate', type=float, default=1e-5)   # Seunghee's plan
     p.add_argument('--num_train_epochs', type=float, default=1)
     p.add_argument('--max_steps', type=int, default=-1)
     p.add_argument('--per_device_train_batch_size', type=int, default=1)
     p.add_argument('--gradient_accumulation_steps', type=int, default=16)
-    p.add_argument('--warmup_ratio', type=float, default=0.05)
+    p.add_argument('--warmup_ratio', type=float, default=0.1)     # Seunghee's plan
     p.add_argument('--max_length', type=int, default=None, help='None = no truncation (lengths are reported first)')
     p.add_argument('--save_steps', type=int, default=25)
     p.add_argument('--report_to', default='none')
