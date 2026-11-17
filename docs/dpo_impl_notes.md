@@ -99,18 +99,52 @@
 
 ## 실행 순서
 
+`outputs/rft/merged`는 RFT 학습 후 병합한 모델 폴더를 뜻하는 **임시 이름**이에요. 실제 경로로 바꿔서 쓰세요.
+
+### 1. 맥에서 (CPU) — 끝남
+
+| 명령 | 하는 일 | 결과 파일 |
+|---|---|---|
+| `python scripts/loop_onset.py` | 잘린 응답 1,044개의 갈림길 후보(60/45/30/15%) 계산 | `outputs/dpo/loop_candidates.jsonl` |
+| `python scripts/dpo_pairs.py` | 정답 쌍 531개 | `outputs/dpo/pairs.jsonl` |
+| `python scripts/dpo_pairs.py --loop_mode cut --out outputs/dpo/pairs_cut.jsonl` | 정답 쌍 + 승희 방식 루프 쌍 230개 | `outputs/dpo/pairs_cut.jsonl` |
+
+(`--compare_gold`는 정답지 비교용이고 결과는 `docs/loop_goldset_v1.md`에 정리돼 있어요. 다시 돌릴 필요 없음)
+
+### 2. 서버로 파일 옮기기
+
+`outputs/`와 `data/`는 git에 없어서 따로 보내야 해요. 위 결과 파일과 재료를 묶은 압축 파일을 레포 루트에서 풀면 같은 경로에 들어가요.
+
 ```bash
-python scripts/test_dpo.py                                            # CPU 테스트
-python scripts/loop_onset.py                                          # [1] (재실행해도 결과 같음)
-python scripts/loop_onset.py --compare_gold outputs/loop_gold/loop_gold_labels.csv   # 라벨링 후
-python scripts/dpo_pairs.py                                           # [3] 정답 쌍만 (지금 가능)
-# --- RFT 체크포인트가 나온 뒤 (서버) ---
-python scripts/dpo_resample.py --model_path outputs/rft/merged --limit 20             # 스모크 테스트
-python scripts/dpo_resample.py --model_path outputs/rft/merged                         # [2]
-python scripts/dpo_pairs.py --resample outputs/dpo/resample.jsonl                      # [3] 정답 + 루프 쌍
-python scripts/train_dpo.py --model_path outputs/rft/merged --check_only               # [4] 사전 검사
-python scripts/train_dpo.py --model_path outputs/rft/merged --output_dir outputs/dpo/run1
+tar xzf dpo_server_bundle_YYYYMMDD.tar.gz        # 레포 루트에서
+md5sum -c outputs/dpo/MANIFEST.md5                 # 전부 OK 나와야 함
 ```
+
+들어 있는 것: 롤아웃 응답 원문(`rollouts_resp.jsonl`, `pilot_resp.jsonl`), `loop_candidates.jsonl`, `pairs.jsonl`, `pairs_cut.jsonl`, 문제 원문(`outputs/decontam/virl/clean.jsonl`), `data/rl/`의 학습·검증셋과 제외 목록 2개.
+ViRL 이미지(`data/virl39k_raw`)는 들어 있지 않아요. 서버에서 받아야 해요: `hf download TIGER-Lab/ViRL39K --repo-type dataset --local-dir data/virl39k_raw`
+
+### 3. 서버에서 (GPU, RFT 모델이 나온 뒤)
+
+```bash
+python scripts/test_dpo.py                                  # CPU 테스트 ("dpo pipeline OK")
+
+# v0: 승희 방식 (재샘플링 없이 바로)
+python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_cut.jsonl --check_only
+python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_cut.jsonl --output_dir outputs/dpo/v0
+
+# v1: 재샘플링 방식
+python scripts/dpo_resample.py --model_path outputs/rft/merged --limit 20     # 스모크 테스트 (20개, 시간 확인)
+python scripts/dpo_resample.py --model_path outputs/rft/merged                # 본 재샘플링 (오래 걸림)
+python scripts/dpo_pairs.py --resample outputs/dpo/resample.jsonl --out outputs/dpo/pairs_resample.jsonl
+python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_resample.jsonl --check_only
+python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_resample.jsonl --output_dir outputs/dpo/v1
+
+# 평가용 병합
+python scripts/merge_lora.py --model_path outputs/rft/merged --adapter outputs/dpo/v0/final_adapter --out outputs/dpo/v0/merged
+```
+
+- `--check_only`: 학습 전에 이미지가 평가와 같게 들어가는지, chosen 끝에만 `<|im_end|>`가 붙는지, 가장 긴 쌍이 몇 토큰인지 출력
+- 재샘플링과 DPO 모두 **RFT 모델로** 해요. DPO의 기준 모델이 시작 모델이라서, 쌍을 만든 모델과 시작 모델이 같아야 해요
 
 ## 열린 결정 (팀 논의)
 
