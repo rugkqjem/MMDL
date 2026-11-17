@@ -194,7 +194,8 @@ def check(pairs, keep, excluded, per_q_limits, min_share=0.5):
     per = Counter((p['id'], p['kind']) for p in pairs)
     for p in pairs:
         assert p['id'] in keep and p['id'] not in excluded, p['id']
-        assert p['chosen'].strip() and p['rejected'].strip(), p['id']
+        # rejected may be all whitespace: a token collapse into spaces (type F) is a loop worth rejecting
+        assert p['chosen'].strip() and p['rejected'], p['id']
         assert '<|im_end|>' not in p['chosen'] + p['rejected'] + p['prefix'], 'stop token inside text'
         if p['kind'] == 'correct':
             assert p['prefix'] == '' and p['rejected_eos']
