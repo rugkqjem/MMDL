@@ -1,7 +1,7 @@
 # DPO 파이프라인 구현 명세 (코드 기준)
 
-> 2026-11-17 · 브랜치 `rl-grpo` · **코드가 실제로 하는 일**만 적은 문서예요. 주의점 조사 문서와 항목별로 대조하고, 서버에서 돌릴 때 순서를 보는 용도예요.
-> GPU 단계(재샘플링, 학습)는 아직 한 번도 안 돌렸어요.
+> 2026-11-17 · 브랜치 `rl-grpo` · 코드가 실제로 하는 일만 적은 문서 · 서버에서 돌릴 때 순서를 보는 용도
+> 실험 결과는 `docs/rft_dpo_results.md`에
 
 ## 전체 흐름
 
@@ -14,7 +14,8 @@
 ```
 
 - 문제 범위: **최종 학습셋 `data/rl/train_final.jsonl`(780문제)**만. 검증셋 272문제는 안 씀
-- 루프 쌍은 두 방식이 있어요. **승희 방식(cut)**은 [1][2] 없이 [3]에서 바로 만들고, **재샘플링 방식**은 [1][2]를 거쳐요. 두 방식 비교는 `docs/dpo_loop_pairs_compare.md`
+- 루프 쌍은 두 방식이 있어요. **v0 방식(cut)**은 [1][2] 없이 [3]에서 바로 만들고, **v1 방식(resampling)**은 [1][2]를 거침  
+  두 방식 비교는 `docs/dpo_loop_pairs_compare.md`
 
 ---
 
@@ -74,7 +75,7 @@
   - TRL 1.17은 이미지 데이터셋에서 EOS를 자동으로 안 붙임 (소스 확인) → 위 문자열 그대로 학습
 - **이미지**: 평가와 같은 `qwen_vl_utils` 리사이즈를 미리 적용, 프로세서 크기를 평가 값으로 고정
 - **손실**: sigmoid DPO, beta 0.1. chosen에 SFT 손실을 더하는 건 옵션(`--sft_weight 1.0`, 기본 꺼짐). LD-DPO(`--ld_alpha`)도 옵션
-- 학습 설정(sft 항, lr, warmup)은 **승희 방식 문서를 따름**
+- 학습 설정(sft 항, lr, warmup)은 **v0 방식 문서(Notion)를 따름**
 - **LoRA**: LLM 디코더 전체 linear, r16, alpha 32, vision 동결 (assert로 확인)
 - **학습**: lr 1e-5 (cosine, warmup 10%), 1에폭, 배치 1 × 누적 16, gradient checkpointing, bf16, 길이 자르지 않음
 - **체크포인트**: 25스텝마다. 이어서 학습해도 이번 실행의 저장 간격을 씀 (GRPO run1에서 체크포인트가 안 남았던 문제 수정)
@@ -111,7 +112,7 @@ bash scripts/run_mmmu_eval.sh --model_path outputs/rft/merged --model_revision '
 - `--max_length 12288`: 긴 응답 + 이미지 토큰이 8192를 넘는 샘플이 있음 (넘으면 건너뛰고 로그에 남김)
 - `--save_steps 50`: 기본값 500이면 중간 체크포인트가 안 남음 (약 170스텝)
 
-### 3. v0: 승희 방식 (RFT 끝나면 바로)
+### 3. v0: cut 방식 (RFT 끝나면 바로)
 
 ```bash
 python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_cut.jsonl --check_only
@@ -129,11 +130,3 @@ python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/
 python scripts/train_dpo.py --model_path outputs/rft/merged --pairs outputs/dpo/pairs_resample.jsonl --output_dir outputs/dpo/v1
 python scripts/merge_lora.py --model_path outputs/rft/merged --adapter outputs/dpo/v1/final_adapter --out outputs/dpo/v1/merged
 ```
-
----
-
-## 열린 결정 (팀 논의)
-
-- **E·G 제외**: 승희 방식 문서는 E(판독 재시도)·G(정상적인 긴 계산)를 빼자고 함. 두 방식 모두 아직 미적용 → 승희의 "의미 밀도 4.5" 정의를 받으면 필터 추가
-- **재샘플링 chosen을 정답만으로 제한할지** (`--loop_chosen_correct`): 빠져나오는 것 자체가 목표면 오답도 허용, 점수까지 노리면 정답만
-- **RFT 데이터와 DPO chosen 겹침**: RFT 데이터가 정해지면 확인
