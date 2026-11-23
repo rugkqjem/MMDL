@@ -32,6 +32,8 @@ def parse_args(argv=None):
     p.add_argument('--dataset_revision', default=DATASET_REVISION)
     p.add_argument('--output', required=True, help='output JSONL path')
     p.add_argument('--subjects', nargs='+', default=SUBJECTS, help='subset for smoke tests; default all 30')
+    # MMMU test answers were released on HF on 2026-02-12; older revisions have '?' as the test answer.
+    p.add_argument('--split', default='validation', choices=['validation', 'test'])
     # "VL" recipe from the pinned model card (huggingface.co/Qwen/Qwen3-VL-4B-Instruct @ebb281ec, README
     # "Generation Hyperparameters"); Qwen's run_mmmu.py uses the same values. generation_config.json only has
     # temperature/top_p/top_k/repetition_penalty (no presence_penalty). The card's "Text" recipe (1.0/1.0/40/2.0)
@@ -143,13 +145,17 @@ def main():
 
     records, inputs = [], []
     for subject in args.subjects:
-        ds = load_dataset('MMMU/MMMU', subject, split='validation',
+        ds = load_dataset('MMMU/MMMU', subject, split=args.split,
                           revision=args.dataset_revision, cache_dir=args.data_root)
         for sample in ds:
             inp, rec = prepare_sample(sample, subject, processor, args)
             inputs.append(inp)
             records.append(rec)
     print(f'prepared {len(inputs)} samples')
+    missing = sum(str(r['answer']).strip() in ('', '?') for r in records)
+    if missing:
+        raise SystemExit(f'{missing}/{len(records)} samples have no answer in split={args.split} at dataset revision '
+                         f'{args.dataset_revision}: rerun with --dataset_revision main (test answers released 2026-02-12)')
 
     llm = make_llm(args)
     sampling = make_sampling(args)
