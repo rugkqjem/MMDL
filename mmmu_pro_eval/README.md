@@ -12,7 +12,11 @@ baseline(Qwen3-VL-4B-Instruct)과 우리가 학습한 v1b(RFT + DPO)를 **MMMU-P
 환경은 레포 루트 README의 MMMU 평가 환경(vLLM, `requirements.lock.txt`) 그대로입니다.
 
 ```bash
-# 두 모델 추론 → 채점 → 비교까지 한 번에
+# GPU 2장: baseline은 GPU 0, v1b는 GPU 1에서 동시에 → 둘 다 끝나면 비교
+bash mmmu_pro_eval/run_compare.sh --gpus 0,1 --data_root <HF datasets 캐시>
+#   진행 로그: outputs/mmmu_pro_std10/{baseline,v1b}/run.log  (tail -f 로 확인)
+
+# GPU 1장: 두 모델을 차례로
 bash mmmu_pro_eval/run_compare.sh --data_root <HF datasets 캐시>
 
 # 한 모델만 (예: baseline 먼저)
@@ -27,7 +31,7 @@ bash mmmu_pro_eval/run_compare.sh --data_root <캐시> --limit 20 --out_root out
 
 - 이미 `predictions.jsonl`이 있는 모델은 추론을 건너뛰고 채점만 다시 합니다. 다시 돌리려면 그 파일을 지우세요.
 - 그 밖의 인자(`--max_new_tokens`, `--gpu_memory_utilization` 등)는 두 모델 추론에 똑같이 들어갑니다.
-- 시간: MMMU-val 900문제가 A100 80GB에서 약 46분이었으니, 1,730문제는 모델당 약 1.5시간으로 예상합니다.
+- 시간: MMMU-val 900문제가 A100 80GB에서 약 46분이었으니, 1,730문제는 모델당 약 1.5시간으로 예상합니다. `--gpus 0,1`이면 두 모델이 동시에 돌아서 전체도 약 1.5시간입니다.
 
 CPU 테스트 (모델·데이터 없이): `python mmmu_pro_eval/test_mmmu_pro_eval.py`
 
