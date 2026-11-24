@@ -24,7 +24,7 @@ MODEL_REVISION = 'ebb281ec70b05090aa6165b016eac8ec08e71b17'
 DATASET_REVISION = '98e6ac0cb9b7b2cd2c991b85a50762edc4aedc68'
 
 
-def parse_args():
+def parse_args(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument('--model_path', default='Qwen/Qwen3-VL-4B-Instruct', help='HF repo id or local checkpoint dir')
     p.add_argument('--model_revision', default=MODEL_REVISION, help="ignored for local dirs; pass '' to disable")
@@ -32,6 +32,8 @@ def parse_args():
     p.add_argument('--dataset_revision', default=DATASET_REVISION)
     p.add_argument('--output', required=True, help='output JSONL path')
     p.add_argument('--subjects', nargs='+', default=SUBJECTS, help='subset for smoke tests; default all 30')
+    # MMMU test answers were released on HF on 2026-02-12; older revisions have '?' as the test answer.
+    p.add_argument('--split', default='validation', choices=['validation', 'test'])
     # "VL" recipe from the pinned model card (huggingface.co/Qwen/Qwen3-VL-4B-Instruct @ebb281ec, README
     # "Generation Hyperparameters"); Qwen's run_mmmu.py uses the same values. generation_config.json only has
     # temperature/top_p/top_k/repetition_penalty (no presence_penalty). The card's "Text" recipe (1.0/1.0/40/2.0)
@@ -52,7 +54,10 @@ def parse_args():
     p.add_argument('--min_pixels', type=int, default=1280 * 28 * 28)
     p.add_argument('--max_pixels', type=int, default=5120 * 28 * 28)
     p.add_argument('--gpu_memory_utilization', type=float, default=0.9)
-    return p.parse_args()
+    # The spec fixes bf16. float16 exists only for run_ablation.sh --smoke on GPUs without bf16 (T4, V100);
+    # scores from such runs are not comparable to the reported ones.
+    p.add_argument('--dtype', default='bfloat16', choices=['bfloat16', 'float16'])
+    return p.parse_args(argv)
 
 
 def build_messages(sample, min_pixels, max_pixels):
@@ -72,6 +77,39 @@ def build_messages(sample, min_pixels, max_pixels):
     ]
     content.append({'type': 'text', 'text': prompt})
     return [{'role': 'user', 'content': content}], prompt, options
+
+
+def prepare_sample(sample, subject, processor, args):
+    """One HF MMMU row -> (vLLM request, output record). Shared with resample_wrong.py so both see identical inputs."""
+    from qwen_vl_utils import process_vision_info
+    messages, prompt, options = build_messages(sample, args.min_pixels, args.max_pixels)
+    text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    image_inputs, video_inputs, video_kwargs = process_vision_info(
+        messages, image_patch_size=processor.image_processor.patch_size,
+        return_video_kwargs=True, return_video_metadata=True)
+    inp = {'prompt': text, 'multi_modal_data': {'image': image_inputs}, 'mm_processor_kwargs': video_kwargs}
+    rec = {
+        'id': sample['id'], 'subject': subject, 'question_type': sample['question_type'],
+        'question': sample['question'], 'options': options, 'answer': sample['answer'],
+        'prompt': prompt, 'num_images': len(image_inputs),
+        'image_sizes': [list(im.size) for im in image_inputs],
+    }
+    return inp, rec
+
+
+def make_llm(args):
+    from vllm import LLM
+    revision = args.model_revision or None
+    return LLM(model=args.model_path, revision=revision, tokenizer_revision=revision, dtype=args.dtype,
+               max_model_len=args.max_model_len, gpu_memory_utilization=args.gpu_memory_utilization,
+               limit_mm_per_prompt={'image': 7}, seed=args.seed)
+
+
+def make_sampling(args, n=1):
+    from vllm import SamplingParams
+    return SamplingParams(n=n, temperature=args.temperature, top_p=args.top_p, top_k=args.top_k,
+                          repetition_penalty=args.repetition_penalty, presence_penalty=args.presence_penalty,
+                          max_tokens=args.max_new_tokens, seed=args.seed)
 
 
 class PeakVRAM(threading.Thread):
@@ -100,39 +138,27 @@ def main():
     import transformers
     import vllm
     from datasets import load_dataset
-    from qwen_vl_utils import process_vision_info
     from transformers import AutoProcessor
-    from vllm import LLM, SamplingParams
 
     revision = args.model_revision or None
     processor = AutoProcessor.from_pretrained(args.model_path, revision=revision)
 
     records, inputs = [], []
     for subject in args.subjects:
-        ds = load_dataset('MMMU/MMMU', subject, split='validation',
+        ds = load_dataset('MMMU/MMMU', subject, split=args.split,
                           revision=args.dataset_revision, cache_dir=args.data_root)
         for sample in ds:
-            messages, prompt, options = build_messages(sample, args.min_pixels, args.max_pixels)
-            text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-            image_inputs, video_inputs, video_kwargs = process_vision_info(
-                messages, image_patch_size=processor.image_processor.patch_size,
-                return_video_kwargs=True, return_video_metadata=True)
-            inputs.append({'prompt': text, 'multi_modal_data': {'image': image_inputs},
-                           'mm_processor_kwargs': video_kwargs})
-            records.append({
-                'id': sample['id'], 'subject': subject, 'question_type': sample['question_type'],
-                'question': sample['question'], 'options': options, 'answer': sample['answer'],
-                'prompt': prompt, 'num_images': len(image_inputs),
-                'image_sizes': [list(im.size) for im in image_inputs],
-            })
+            inp, rec = prepare_sample(sample, subject, processor, args)
+            inputs.append(inp)
+            records.append(rec)
     print(f'prepared {len(inputs)} samples')
+    missing = sum(str(r['answer']).strip() in ('', '?') for r in records)
+    if missing:
+        raise SystemExit(f'{missing}/{len(records)} samples have no answer in split={args.split} at dataset revision '
+                         f'{args.dataset_revision}: rerun with --dataset_revision main (test answers released 2026-02-12)')
 
-    llm = LLM(model=args.model_path, revision=revision, tokenizer_revision=revision, dtype='bfloat16',
-              max_model_len=args.max_model_len, gpu_memory_utilization=args.gpu_memory_utilization,
-              limit_mm_per_prompt={'image': 7}, seed=args.seed)
-    sampling = SamplingParams(temperature=args.temperature, top_p=args.top_p, top_k=args.top_k,
-                              repetition_penalty=args.repetition_penalty, presence_penalty=args.presence_penalty,
-                              max_tokens=args.max_new_tokens, seed=args.seed)
+    llm = make_llm(args)
+    sampling = make_sampling(args)
 
     vram = PeakVRAM()
     vram.start()

@@ -1,0 +1,88 @@
+id,subject,question_type,direction,reason,detail,gold,r1_status,r1_tokens,r1_answer,r2_status,r2_tokens,r2_answer,r1_task1_category
+validation_Accounting_17,Accounting,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 7451 tokens,"C. $126,925",finished,7451,C,loop,32768,(truncated),(1차 정답)
+validation_Architecture_and_Engineering_13,Architecture_and_Engineering,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 13210 tokens,B. 4.12 mm,finished,13210,B,loop,32768,(truncated),(1차 정답)
+validation_Architecture_and_Engineering_20,Architecture_and_Engineering,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 13914 tokens,"B. Side width $w_{1}$ = 37.5 m,Side width $w_{2}$ = 25.0 m,Total area = 418.75 $m^{2}$",finished,13914,B,loop,32768,(truncated),(1차 정답)
+validation_Architecture_and_Engineering_9,Architecture_and_Engineering,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 13432 tokens,B. 14583 $m^{3}$,finished,13432,B,loop,32768,(truncated),(1차 정답)
+validation_Biology_4,Biology,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 498 tokens,B. autosomal dominant (AD),finished,498,B,loop,32768,(truncated),(1차 정답)
+validation_Electronics_17,Electronics,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 13436 tokens,A. 10e^{-0.8t} V,finished,13436,A,loop,32768,(truncated),(1차 정답)
+validation_Electronics_22,Electronics,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 10568 tokens,C. [70.7 cos (20t - 45^{\circ})] u(t) V,finished,10568,C,loop,32768,(truncated),(1차 정답)
+validation_Energy_and_Power_18,Energy_and_Power,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 6297 tokens,C. 0.3 kW,finished,6297,C,loop,32768,(truncated),(1차 정답)
+validation_Energy_and_Power_23,Energy_and_Power,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 6473 tokens,A. 0.152 m,finished,6473,A,loop,32768,(truncated),(1차 정답)
+validation_Energy_and_Power_3,Energy_and_Power,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 4559 tokens,C. 5.25 kg/s,finished,4559,C,loop,32768,(truncated),(1차 정답)
+validation_Energy_and_Power_7,Energy_and_Power,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 10109 tokens,"C. 4.87, 30.8 kW",finished,10109,C,loop,32768,(truncated),(1차 정답)
+validation_Finance_9,Finance,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 2942 tokens,D. $7 million,finished,2942,D,loop,32768,(truncated),(1차 정답)
+validation_History_12,History,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 1145 tokens,A. Phillip II and Mary I,finished,1145,A,loop,32768,(truncated),(1차 정답)
+validation_Materials_1,Materials,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 12014 tokens,B. 1.57,finished,12014,B,loop,32768,(truncated),(1차 정답)
+validation_Materials_17,Materials,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 4427 tokens,C. 121 psi,finished,4427,C,loop,32768,(truncated),(1차 정답)
+validation_Materials_5,Materials,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 3545 tokens,B. 148 kg,finished,3545,B,loop,32768,(truncated),(1차 정답)
+validation_Music_18,Music,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 1462 tokens,B. c melodic minor scale,finished,1462,B,loop,32768,(truncated),(1차 정답)
+validation_Music_5,Music,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 1031 tokens,B. False,finished,1031,B,loop,32768,(truncated),(1차 정답)
+validation_Pharmacy_24,Pharmacy,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 2030 tokens,A. Topoisomerase poison,finished,2030,A,loop,32768,(truncated),(1차 정답)
+validation_Public_Health_28,Public_Health,multiple-choice,R->W,2차에 루프에 빠짐,run1 finished at 8750 tokens,C. 12.96,finished,8750,C,loop,32768,(truncated),(1차 정답)
+validation_Energy_and_Power_17,Energy_and_Power,multiple-choice,R->W,둘 다 루프 - 우연 일치 여부만 다름,1차 loop text matched by chance,A. 50 m,loop,16384,(truncated),loop,32768,(truncated),(1차 정답)
+validation_Energy_and_Power_9,Energy_and_Power,multiple-choice,R->W,둘 다 루프 - 우연 일치 여부만 다름,1차 loop text matched by chance,C. 26100 Pa,loop,16384,(truncated),loop,32768,(truncated),(1차 정답)
+validation_Finance_5,Finance,multiple-choice,R->W,둘 다 루프 - 우연 일치 여부만 다름,1차 loop text matched by chance,"D. the cost of merger through stocks offer is $5,000,000",loop,16384,(truncated),loop,32768,(truncated),(1차 정답)
+validation_Basic_Medical_Science_14,Basic_Medical_Science,open,R->W,"둘 다 완주, 답은 같고 추출·표기가 달라짐",both answer 'genetic engineering / recombinant DNA'; run1 had no marker so the full response was parsed and matched the word 'Transformation' in a step list (false positive); run2 marker -> fail,Transformation,finished,312,"The process illustrated in Figure 1 is **genetic engineering** (specifically, **recombinant DNA technology**), which inv",finished,280,Genetic engineering / Recombinant DNA technology,(1차 정답)
+validation_Basic_Medical_Science_17,Basic_Medical_Science,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'B',A. E,finished,325,A,finished,243,B,(1차 정답)
+validation_Biology_30,Biology,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'F' -> run2 'I',"F. segmentation, type of symmetry and head-tail orientation",finished,190,F,finished,235,I,(1차 정답)
+validation_Chemistry_19,Chemistry,open,R->W,"둘 다 완주, 최종 답이 달라짐",run1 '4' -> run2 '2',4,finished,5792,4,finished,6791,2,(1차 정답)
+validation_Chemistry_21,Chemistry,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'D',B. Both C atoms and both O atoms lie in the same plane. ,finished,8844,B,finished,6049,D,(1차 정답)
+validation_Energy_and_Power_26,Energy_and_Power,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'B',C. 3400 lbf/ft^2,finished,4321,C,finished,9239,B,(1차 정답)
+validation_Finance_25,Finance,open,R->W,"둘 다 완주, 최종 답이 달라짐",run1 '0.286' -> run2 '0.952',0.286,finished,721,0.286,finished,5392,0.952,(1차 정답)
+validation_Geography_21,Geography,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'C',"A. Vulnerable, Endangered, Critical",finished,485,A,finished,731,C,(1차 정답)
+validation_Geography_26,Geography,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'A',C. Weathering unloading structure and weathering fragment structure,finished,551,C,finished,863,A,(1차 정답)
+validation_Materials_16,Materials,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'A',C. 50.4 kip,finished,6474,C,finished,12187,A,(1차 정답)
+validation_Materials_18,Materials,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'C',B. 6.00*10^(-3) mm/mm,finished,6988,B,finished,5036,C,(1차 정답)
+validation_Mechanical_Engineering_15,Mechanical_Engineering,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'D' -> run2 'B',D. D,finished,2635,D,finished,1655,B,(1차 정답)
+validation_Mechanical_Engineering_17,Mechanical_Engineering,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'B',A. A,finished,691,A,finished,580,B,(1차 정답)
+validation_Mechanical_Engineering_26,Mechanical_Engineering,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'D',B. B,finished,850,B,finished,1565,D,(1차 정답)
+validation_Mechanical_Engineering_30,Mechanical_Engineering,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'D' -> run2 'C',D. D,finished,2278,D,finished,496,C,(1차 정답)
+validation_Music_4,Music,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'C',B. 7,finished,2818,B,finished,3214,C,(1차 정답)
+validation_Physics_1,Physics,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'B',A. To the left,finished,8772,A,finished,1488,B,(1차 정답)
+validation_Psychology_30,Psychology,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'E' -> run2 'A',E. <image 5>,finished,1684,E,finished,313,A,(1차 정답)
+validation_Sociology_10,Sociology,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'The image shows a person in a casual set' -> run2 'B',C. Not sure,finished,274,"The image shows a person in a casual setting, interacting with patrons at an outdoor café. The caption explicitly asks: ",finished,261,B,(1차 정답)
+validation_Sociology_13,Sociology,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'A',B. partial observation for the work space,finished,160,B,finished,201,A,(1차 정답)
+validation_Sociology_8,Sociology,multiple-choice,R->W,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'C',B. False,finished,252,B,finished,308,C,(1차 정답)
+validation_Architecture_and_Engineering_12,Architecture_and_Engineering,multiple-choice,W->R,1차 잘림 -> 2차 16384 넘겨 완주 (예산 효과),run2 18792 tokens,"C. B = 143°44'00.34"";C = 238°16'11.87"";D = 307°08'20.76""",loop,16384,(truncated),finished,18792,C,1. 응답 잘림 - 반복 루프
+validation_Accounting_26,Accounting,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 4589 tokens (< 16384)","A. 350 units and $34,647.65",loop,16384,(truncated),finished,4589,A,1. 응답 잘림 - 반복 루프
+validation_Accounting_4,Accounting,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 4270 tokens (< 16384)",D. $0,loop,16384,(truncated),finished,4270,D,1. 응답 잘림 - 반복 루프
+validation_Architecture_and_Engineering_6,Architecture_and_Engineering,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 14199 tokens (< 16384)",A. The scale of the photographs is 1 cm = 62.5 m;Air base = 625 m,loop,16384,(truncated),finished,14199,A,1. 응답 잘림 - 반복 루프
+validation_Architecture_and_Engineering_7,Architecture_and_Engineering,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 9309 tokens (< 16384)",A. 2.603,loop,16384,(truncated),finished,9309,A,1. 응답 잘림 - 반복 루프
+validation_Chemistry_28,Chemistry,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 5105 tokens (< 16384)","A. (A) = 6.87D, (B) = 4.11D",loop,16384,(truncated),finished,5105,A,1. 응답 잘림 - 반복 루프
+validation_Electronics_18,Electronics,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 10148 tokens (< 16384)",B. 3 e^{-2t} u(t),loop,16384,(truncated),finished,10148,B,1. 응답 잘림 - 반복 루프
+validation_Electronics_9,Electronics,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 trunc_calc, run2 finished at 11404 tokens (< 16384)",C. -2[sin t + (1 / 2) sin 25 + (1 / 3) sin 3t + ...],trunc_calc,16384,(truncated),finished,11404,C,6. 애매 (따로 모음)
+validation_Energy_and_Power_1,Energy_and_Power,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 5826 tokens (< 16384)",B. 350.93K,loop,16384,(truncated),finished,5826,B,1. 응답 잘림 - 반복 루프
+validation_Finance_21,Finance,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 4948 tokens (< 16384)","A. $2,100",loop,16384,(truncated),finished,4948,A,1. 응답 잘림 - 반복 루프
+validation_Finance_28,Finance,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 3397 tokens (< 16384)",A. 5.58,loop,16384,(truncated),finished,3397,A,1. 응답 잘림 - 반복 루프
+validation_Materials_25,Materials,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 7204 tokens (< 16384)",B. 0.841 g/cm^3,loop,16384,(truncated),finished,7204,B,1. 응답 잘림 - 반복 루프
+validation_Mechanical_Engineering_22,Mechanical_Engineering,multiple-choice,W->R,1차 잘림 -> 2차 루프 없이 완주,"run1 loop, run2 finished at 5508 tokens (< 16384)","B. 6857lb,1643lb",loop,16384,(truncated),finished,5508,B,1. 응답 잘림 - 반복 루프
+validation_Materials_11,Materials,multiple-choice,W->R,2차 루프 - 루프 속 문장이 우연히 정답,"run2 extracted '1.49 kN, option D.'",D. 1.49 kN,finished,12761,A,loop,32768,(truncated),4. 객관식 오답
+validation_Mechanical_Engineering_1,Mechanical_Engineering,multiple-choice,W->R,2차 루프 - 루프 속 문장이 우연히 정답,run2 extracted 'Option D — because the cutting plane is horizontal',D. D,finished,2800,C,loop,32768,(truncated),4. 객관식 오답
+validation_Art_1,Art,multiple-choice,W->R,둘 다 루프 - 우연 일치 여부만 다름,2차 loop text matched by chance,C. Hermione,loop,16384,(truncated),loop,32768,(truncated),1. 응답 잘림 - 반복 루프
+validation_Art_Theory_3,Art_Theory,multiple-choice,W->R,둘 다 루프 - 우연 일치 여부만 다름,2차 loop text matched by chance,B. the attendants to the princess in the foreground,loop,16384,(truncated),loop,32768,(truncated),1. 응답 잘림 - 반복 루프
+validation_Music_28,Music,multiple-choice,W->R,둘 다 루프 - 우연 일치 여부만 다름,2차 loop text matched by chance,B. minor 7th,loop,16384,(truncated),loop,32768,(truncated),1. 응답 잘림 - 반복 루프
+validation_Electronics_25,Electronics,open,W->R,"둘 다 완주, 답은 같고 추출·표기가 달라짐","both answer 50 V; run1 extractor took the sentence on the 'Answer:' line, run2 \boxed{50 V}",50,finished,1200,"Given the ambiguity in terminology, and based on standard interpretation in rectifier circuits, the safe PRV (Peak Rever",finished,1968,50  V,2. 추출 실패 (답은 맞음)
+validation_Finance_20,Finance,open,W->R,"둘 다 완주, 답은 같고 추출·표기가 달라짐","both 7,243,000; run1 '7,243,000' (separator, fail), run2 \boxed{7243000}",7243000,finished,1359,"7,243,000",finished,2796,7243000,3. 표기 차이
+validation_Architecture_and_Engineering_2,Architecture_and_Engineering,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'A',A. 35.567 $\approx$ 36,finished,1481,C,finished,4736,A,4. 객관식 오답
+validation_Biology_14,Biology,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'E',E. 1/16,finished,7300,A,finished,2524,E,4. 객관식 오답
+validation_Biology_27,Biology,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'E',E. XAXa,finished,8423,B,finished,1954,E,4. 객관식 오답
+validation_Chemistry_24,Chemistry,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'D',D. 30.58 kJ/mol,finished,15385,C,finished,6203,D,4. 객관식 오답
+validation_Clinical_Medicine_28,Clinical_Medicine,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'D',D. Diffuse scleroderma,finished,2682,B,finished,1722,D,4. 객관식 오답
+validation_Clinical_Medicine_30,Clinical_Medicine,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'C',C. Prolonged immobilization,finished,1040,A,finished,773,C,4. 객관식 오답
+validation_Clinical_Medicine_8,Clinical_Medicine,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'C',C. Complement mediated cell destruction,finished,560,A,finished,564,C,4. 객관식 오답
+validation_Computer_Science_4,Computer_Science,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'A',A. yes,finished,5065,B,finished,3725,A,4. 객관식 오답
+validation_Diagnostics_and_Laboratory_Medicine_23,Diagnostics_and_Laboratory_Medicine,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'A',A. Eosinophilic granuloma,finished,259,C,finished,349,A,4. 객관식 오답
+validation_Diagnostics_and_Laboratory_Medicine_24,Diagnostics_and_Laboratory_Medicine,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'D',D. Progressive Multifocal Leukoencephalopathy (PML),finished,589,C,finished,403,D,4. 객관식 오답
+validation_Economics_28,Economics,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'A',A. Leisure time is 24 hours.,finished,3058,B,finished,2830,A,4. 객관식 오답
+validation_Economics_30,Economics,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'C',C. 3,finished,4674,A,finished,1103,C,4. 객관식 오답
+validation_Finance_29,Finance,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'C',C. Project A: does's exist; Project B: 3 years; Project C: 5 years,finished,5646,B,finished,7188,C,4. 객관식 오답
+validation_Finance_8,Finance,open,W->R,"둘 다 완주, 최종 답이 달라짐",run1 '860' -> run2 '360',360,finished,4293,860,finished,2055,360,5. 주관식 오답
+validation_Geography_13,Geography,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'D',D. 02-01-C5-007,finished,413,C,finished,406,D,4. 객관식 오답
+validation_Geography_2,Geography,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'D',D. Number of joints,finished,2088,C,finished,1878,D,4. 객관식 오답
+validation_Manage_26,Manage,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'A',"A. Slacks are: 0, 2, 11, 0, 2, 11, 0",finished,10972,C,finished,7368,A,4. 객관식 오답
+validation_Materials_2,Materials,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'B',B. (P/A)sin^2($\theta$),finished,7565,C,finished,1602,B,4. 객관식 오답
+validation_Math_7,Math,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'C' -> run2 'A',"A. (1), (2), (3), (4), (5), (6)",finished,1714,C,finished,3142,A,4. 객관식 오답
+validation_Mechanical_Engineering_13,Mechanical_Engineering,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'B' -> run2 'A',A. A,finished,596,B,finished,615,A,4. 객관식 오답
+validation_Pharmacy_13,Pharmacy,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'A' -> run2 'B',B. False,finished,201,A,finished,249,B,4. 객관식 오답
+validation_Physics_21,Physics,open,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'D' -> run2 'A',A,finished,2047,D,finished,551,A,5. 주관식 오답
+validation_Public_Health_9,Public_Health,multiple-choice,W->R,"둘 다 완주, 최종 답이 달라짐",run1 'D' -> run2 'A',A. 0.93,finished,7949,D,finished,3192,A,4. 객관식 오답

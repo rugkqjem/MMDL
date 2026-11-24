@@ -10,6 +10,10 @@
                   see every option letter mentioned during reasoning (Qwen's pipeline hands those to a GPT judge).
                   Writes scores_{parser}.*
   --extract none : feed the full response to the parser, as upstream does. Writes scores_{parser}_raw.*
+
+  --normalize    : open questions only -- rewrite LaTeX notation as plain text (normalize_latex()) on both sides
+                   of the comparison before the parser runs. Off by default: unlike extract_final_answer(), these
+                   rules have no upstream precedent, so they are opt-in and reported separately (scores_*_norm.*).
 """
 import argparse
 import ast
@@ -53,6 +57,39 @@ def _clean(span):
     return re.sub(r'\*\*|__|\$', '', s)
 
 
+# --- LaTeX notation, opt-in via --normalize -------------------------------------------------------
+# Notation only: every rule below rewrites how a value is written, never the value itself. In particular
+# nothing is evaluated (\sqrt{2} stays symbolic) and nothing is rounded, so a response that states the
+# right quantity in a different form -- 2\sqrt{2} against a gold of 2.83 -- is still counted wrong.
+# scripts/analyze_open_failures.py measures what those remaining cases cost.
+_FRAC = re.compile(r'\\[dt]?frac\s*\{([^{}]+)\}\s*\{([^{}]+)\}')
+_ATOM = re.compile(r'^[\w.]+$')  # a fraction part that needs no parentheses: 1/64, not (a+b)/2
+
+
+def _frac(m):
+    num, den = m.group(1).strip(), m.group(2).strip()
+    wrap = lambda t: t if _ATOM.match(t) else f'({t})'
+    return f'{wrap(num)}/{wrap(den)}'
+
+
+def normalize_latex(text):
+    r"""Rewrite LaTeX notation as plain text: '\dfrac{1}{64}' -> '1/64', '$\text{MgS}$' -> 'MgS'.
+
+    Value-preserving by construction -- no arithmetic, no rounding, no unit handling.
+    """
+    s = re.sub(r'\\(?:left|right)\b', '', text)
+    s = re.sub(r'\\[,;:!]|\\ ', ' ', s)
+    s = re.sub(r'\\(?:text|mathrm|mathbf|mathit|operatorname)\s*\{([^{}]*)\}', r'\1', s)
+    for _ in range(3):  # nested fractions, innermost first
+        s, n = _FRAC.subn(_frac, s)
+        if not n:
+            break
+    s = re.sub(r'([_^])\s*\{([^{}]*)\}', r'\1\2', s)  # 10^{-4} -> 10^-4
+    s = s.replace(r'\times', '*').replace(r'\cdot', '*')
+    s = s.replace('$', '')
+    return re.sub(r'[ \t]+', ' ', s).strip()
+
+
 def extract_final_answer(response, options):
     """Fixed, model-independent rule that stands in for Qwen's GPT-judge extraction step. Returns (text, how).
 
@@ -84,12 +121,15 @@ def extract_final_answer(response, options):
     return span, how
 
 
-def score_qwen(rec, text=None):
+def score_qwen(rec, text=None, normalize=False):
     """Mirrors run_mmmu.py run_evaluation() + eval_utils.extract_answer_from_item() without the judge."""
     prediction = (rec['response'] if text is None else text).split('</think>')[-1].strip()
+    answer = rec['answer']
+    if normalize and not rec['options']:  # both sides, so the comparison stays symmetric
+        prediction, answer = normalize_latex(prediction), normalize_latex(answer)
     # MMMU_preproc: open question -> 2-choice {A: gold, B: 'Other Answers'}
     choices = (dict(zip(string.ascii_uppercase, rec['options'])) if rec['options']
-               else {'A': rec['answer'], 'B': 'Other Answers'})
+               else {'A': answer, 'B': 'Other Answers'})
     # answer_map: any gold that is not a single uppercase letter becomes 'A' (applied to all questions upstream)
     gt = rec['answer'] if rec['answer'] in list(string.ascii_uppercase) else 'A'
     ret = can_infer(prediction, dict(choices))
@@ -112,7 +152,7 @@ class _CountingRandom:
 mmmu.random = _CountingRandom()
 
 
-def score_mmmu(rec, text=None):
+def score_mmmu(rec, text=None, normalize=False):
     """Mirrors MMMU main_parse_and_eval.py: parse then eval_multi_choice / eval_open."""
     response = rec['response'] if text is None else text
     if rec['options']:
@@ -124,6 +164,9 @@ def score_mmmu(rec, text=None):
     gold = rec['answer']
     if gold.startswith('['):  # HF stores multi-answer gold as a list literal, e.g. "['Tampa', 'Florida']"
         gold = ast.literal_eval(gold)
+    if normalize:  # both sides, so the comparison stays symmetric
+        response = normalize_latex(response)
+        gold = [normalize_latex(g) for g in gold] if isinstance(gold, list) else normalize_latex(gold)
     pred = mmmu.parse_open_response(response)
     return json.dumps(pred, ensure_ascii=False, default=str), 'open', mmmu.eval_open(gold, pred)
 
@@ -136,6 +179,9 @@ def main():
     p.add_argument('--extract', choices=['final', 'none'], default='final',
                    help='final: parse extract_final_answer() output (scores_{parser}.*); '
                         'none: parse the full response like upstream (scores_{parser}_raw.*)')
+    p.add_argument('--normalize', action='store_true',
+                   help='open questions only: rewrite LaTeX notation as plain text on both sides before the '
+                        'parser (normalize_latex()). Off by default; writes scores_{parser}[_raw]_norm.*')
     args = p.parse_args()
 
     with open(args.pred) as f:
@@ -145,7 +191,7 @@ def main():
     rows = []
     for rec in recs:
         text, how = extract_final_answer(rec['response'], rec['options']) if args.extract == 'final' else (None, '')
-        pred, method, correct = scorer(rec, text)
+        pred, method, correct = scorer(rec, text, args.normalize)
         # full responses stay in predictions.jsonl (join on id)
         rows.append({'id': rec['id'], 'subject': rec['subject'], 'question_type': rec['question_type'],
                      'answer': rec['answer'], 'extract': how, 'extracted': text, 'parsed': pred, 'method': method,
@@ -165,14 +211,14 @@ def main():
     extracts = {e: sum(r['extract'] == e for r in rows) for e in dict.fromkeys(r['extract'] for r in rows)}
 
     os.makedirs(args.output_dir, exist_ok=True)
-    name = args.parser if args.extract == 'final' else f'{args.parser}_raw'
+    name = args.parser + ('' if args.extract == 'final' else '_raw') + ('_norm' if args.normalize else '')
     stem = os.path.join(args.output_dir, f'scores_{name}')
     with open(stem + '.csv', 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
     with open(stem + '.json', 'w') as f:
-        json.dump({'parser': args.parser, 'extract': args.extract, 'macro_acc': macro, 'micro_acc': micro,
+        json.dump({'parser': args.parser, 'extract': args.extract, 'normalize': args.normalize, 'macro_acc': macro, 'micro_acc': micro,
                    'num_samples': len(rows), 'methods': methods, 'extracts': extracts, 'subjects': table},
                   f, indent=2)
     lines = ['| No. | Subject | Data Num | Acc |', '|---|---|---|---|']
@@ -182,7 +228,8 @@ def main():
         f.write('\n'.join(lines) + '\n')
 
     print('\n'.join(lines))
-    print(f'parser={args.parser} extract={args.extract} macro={macro:.2f} micro={micro:.2f} '
+    print(f'parser={args.parser} extract={args.extract} normalize={args.normalize} '
+          f'macro={macro:.2f} micro={micro:.2f} '
           f'methods={methods} extracts={extracts}')
 
 

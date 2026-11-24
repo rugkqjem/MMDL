@@ -1,0 +1,461 @@
+id,subject,question_type,category,category_key,flags,note,gold,extract,extracted,parsed,method,finish_reason,num_output_tokens,zlib_last10k,repeated_line_ratio,run2_correct
+validation_Electronics_11,Electronics,open,1. 응답 잘림 - 루프 없이 계산 중,trunc_calc,,,0.3,phrase,"to write the nodal equation for node n3, and then solve for v_x.",,fail,length,16384,0.2148,0.304,False
+validation_Electronics_6,Electronics,open,1. 응답 잘림 - 루프 없이 계산 중,trunc_calc,,,71.6,phrase,"72 V, but let's box 71.7.",,fail,length,16384,0.3021,0.054,False
+validation_Energy_and_Power_15,Energy_and_Power,multiple-choice,1. 응답 잘림 - 루프 없이 계산 중,trunc_calc,,,A. 0.0174 m^3/s,phrase,B,B,rule,length,16384,0.1882,0.406,False
+validation_Accounting_20,Accounting,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 18.1%,none,"We are given a **multifactor APT model** with two factors: \( F_1 \) and \( F_2 \). The expected return of a portfolio is modeled as:
+
+\[
+E(R) = R_f + \beta_1 \cdot r_1 + \beta_2 \cdot r_2
+\]
+
+Where:
+",,fail,length,16384,0.0314,0.956,False
+validation_Accounting_22,Accounting,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 3.096,none,"To calculate the **Z-score** for Seether, LLC, we use the **Altman Z-score formula**, which is:
+
+> **Z = 1.2A + 1.4B + 3.3C + 0.6D + 1.0E**
+
+Where:
+- **A** = Net Working Capital / Total Assets
+- **B**",,fail,length,16384,0.0494,0.957,False
+validation_Accounting_26,Accounting,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"A. 350 units and $34,647.65",none,"We are given the current CVP data for Baghdad Company:
+
+- Current sales price per unit = $90  
+- Current variable cost per unit = $40  
+- Current contribution margin per unit = $50  
+- Fixed costs = $",,fail,length,16384,0.0034,0.0,True
+validation_Accounting_4,Accounting,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. $0,phrase,"option B — 12,000 — because it’s given — but that’s not missing.",B,rule,length,16384,0.0603,0.989,True
+validation_Accounting_5,Accounting,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"B. 134,485",none,"To calculate **equivalent units for conversion costs** using the **weighted-average method**, we use the formula:
+
+> **Equivalent Units = Units Transferred Out + (Ending WIP × Percentage Complete for ",,fail,length,16384,0.0605,0.967,False
+validation_Architecture_and_Engineering_1,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 9.75kips compression,none,"To determine the **maximum live load force in bar CG**, we must consider both:
+
+1. The **uniform live load** of 0.32 kip/ft over the entire span (90 ft).
+2. The **concentrated live load** of 24 kips, ",,fail,length,16384,0.0186,0.967,False
+validation_Architecture_and_Engineering_10,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. 4723 $m^{2}$,none,"To calculate the area of a closed traverse using the **Double Meridian Distance (D.M.D.) method**, we follow these steps:
+
+---
+
+### Step 1: Understand the D.M.D. Method
+
+The D.M.D. method uses the for",,fail,length,16384,0.0551,0.991,False
+validation_Architecture_and_Engineering_12,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"C. B = 143°44'00.34"";C = 238°16'11.87"";D = 307°08'20.76""",none,"We are given:
+
+- S is a satellite station to triangulation station A, 12 m away.
+- Bearings from S to the points:
+  - S to A: **0°00'00""** (i.e., due north)
+  - S to B: **143°36'20""**
+  - S to C: **23",,fail,length,16384,0.0086,0.0,True
+validation_Architecture_and_Engineering_14,Architecture_and_Engineering,open,1. 응답 잘림 - 반복 루프,trunc_loop,,,1.06,none,"To compute the **initial deflection at midspan** of the beam using a **finite summation** (i.e., numerical integration via discrete segments), we must:
+
+1. **Model the beam as a series of 3-ft (36-inc",,fail,length,16384,0.0958,0.988,False
+validation_Architecture_and_Engineering_15,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. -1.74k compr,phrase,"-1.84, and I have the wrong x_D.",,fail,length,16384,0.0681,0.986,False
+validation_Architecture_and_Engineering_17,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. 29.693 * 106 $m^{3}$,none,"To calculate the volume of water impounded when the water level reaches **700 m**, using the **prismoidal formula**, we need to apply the formula for volume between two contours, given areas at differ",,fail,length,16384,0.0595,0.974,False
+validation_Architecture_and_Engineering_18,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"B. 947.8 m, 216°45'",phrase,"947.8, and I have a calculation error in the cumulative.",,fail,length,16384,0.0882,0.871,False
+validation_Architecture_and_Engineering_29,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. Gradient = 1 in 33.95 m fall,phrase,C,C,rule,length,16384,0.0643,0.989,False
+validation_Architecture_and_Engineering_6,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. The scale of the photographs is 1 cm = 62.5 m;Air base = 625 m,phrase,not 1 cm : 75 m — but maybe they want scale in different units?,,fail,length,16384,0.0386,0.963,True
+validation_Architecture_and_Engineering_7,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 2.603,phrase,"2.703, and the formula is:",B,rule,length,16384,0.0596,0.994,True
+validation_Architecture_and_Engineering_8,Architecture_and_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"C. $\alpha$ = 20°10'11.82"",$\beta $ = 30°20'32.73""",phrase,"option B, with 20°10'11.82"" and 30°20'38.73"", and they used a different precision or a different formula.",B,rule,length,16384,0.0992,0.935,False
+validation_Art_1,Art,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. Hermione,phrase,> B. Matilda,B,rule,length,16384,0.0436,0.978,True
+validation_Art_12,Art,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. PAUL CÉZANNE,phrase,B,B,rule,length,16384,0.0318,0.991,False
+validation_Art_21,Art,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. Artemisia Gentileschi 1612-13,phrase,Caravaggio — and the year is 1597–1598 — so option B is wrong.,B,rule,length,16384,0.0394,0.974,False
+validation_Art_Theory_3,Art_Theory,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. the attendants to the princess in the foreground,none,"The painting in question is **“The Artist’s Studio”** (also known as **“The Studio of the Painter”**) by **Rembrandt**, but more accurately, it is **“The Night Watch”** — wait, no, that’s a different ",,fail,length,16384,0.0168,0.976,True
+validation_Biology_17,Biology,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. Lateral pterygoid plate,none,"The image shows a **lateral view of the base of the skull**, with numbered labels pointing to specific anatomical structures.
+
+Let’s analyze label **204**:
+
+- It is located near the **temporal bone**,",,fail,length,16384,0.0515,0.968,False
+validation_Biology_20,Biology,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. 65% of the maximum HbO2 would be delivered.,phrase,often calculated as:,,fail,length,16384,0.0474,0.989,False
+validation_Chemistry_28,Chemistry,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"A. (A) = 6.87D, (B) = 4.11D",none,"To determine the dipole moments of compounds (A) and (B), we need to analyze their molecular symmetry and the direction of the dipole moments.
+
+---
+
+**Compound (A):**  
+Structure: A benzene ring with ",,fail,length,16384,0.0543,0.923,True
+validation_Electronics_18,Electronics,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 3 e^{-2t} u(t),phrase,3t e^{-2t}u(t).,,fail,length,16384,0.0512,0.951,True
+validation_Electronics_28,Electronics,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 75 + 13.3 cos(250t - 57.7°)V,none,"We are given a circuit with AC sources and passive components, and we need to find $ v_2 $, which is the voltage across the 15Ω resistor (and also across the inductor, since they are in series). The c",,fail,length,16384,0.0713,0.839,False
+validation_Energy_and_Power_1,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 350.93K,none,"We are given a hemispherical heat source embedded in a large silicon substrate, with:
+
+- Radius of hemisphere: \( r_o = 0.1 \, \text{mm} = 0.1 \times 10^{-3} \, \text{m} = 10^{-4} \, \text{m} \)
+- The",,fail,length,16384,0.0449,0.993,True
+validation_Energy_and_Power_10,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 0.71 W/m K,none,"To find the thermal conductivity of the test specimen material using the **guarded hot plate method**, we use the formula:
+
+\[
+k = \frac{Q}{A \cdot \Delta T}
+\]
+
+Where:
+- \( k \) = thermal conductivit",,fail,length,16384,0.0373,0.988,False
+validation_Energy_and_Power_12,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. W=917Btu,phrase,1017 Btu.,,fail,length,16384,0.076,0.987,False
+validation_Energy_and_Power_13,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. q=0.48,phrase,to assume that the evaporator is at -34°C — and the refrigerant is saturated — quality = 1.0 — but not in options.,,fail,length,16384,0.0484,0.964,False
+validation_Energy_and_Power_14,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. 1.52 m,phrase,B,B,rule,length,16384,0.0614,0.972,False
+validation_Energy_and_Power_20,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. W' =-6.3MW,none,"We are given a pump system in a tall building. We need to find the **pump work** required to raise water from a pressure of 600 kPa at 5 m below ground level to 200 kPa at the top floor, which is 150 ",,fail,length,16384,0.0432,0.973,False
+validation_Energy_and_Power_25,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"C. (1) 6081 kW, (2) 0.536",phrase,B,B,rule,length,16384,0.0522,0.989,False
+validation_Energy_and_Power_4,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. $0.00047\frac{Btu}{lbm\cdotR}$,none,"We are given an adiabatic expansion of R-134a through a valve (throttling process), from:
+
+- **State 1 (inlet):** 100 psia, 100°F  
+- **State 2 (outlet):** Saturated vapor at 10 psia
+
+We are to find t",,fail,length,16384,0.058,0.985,False
+validation_Energy_and_Power_8,Energy_and_Power,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. 22.6 cm,none,"We are given a manometer with multiple fluids: Meriam red oil (SG = 0.827), water, mercury, and we’re told that the pressure difference \( p_B - p_A = 97 \) kPa. We need to find the height \( H \) in ",,fail,length,16384,0.044,0.976,False
+validation_Finance_21,Finance,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"A. $2,100",phrase,C,C,rule,length,16384,0.0986,0.871,True
+validation_Finance_28,Finance,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 5.58,phrase,C,C,rule,length,16384,0.0643,0.992,True
+validation_Geography_1,Geography,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"D. 2.5kN.m, -3kN.m",none,"To determine the torque at sections 1-1 and 2-2, we need to apply the **principle of equilibrium** for torsional loading in a rod fixed at one end.
+
+The rod is fixed at the left end, so it cannot rota",,fail,length,16384,0.0432,0.978,False
+validation_Geography_8,Geography,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 30kPa,none,"To determine the **pore water pressure at point G**, we need to use the **flow network** provided.
+
+---
+
+### Step 1: Understand the flow network
+
+- The dam height is **H = 16 m** (from ground level to",,fail,length,16384,0.0732,0.989,False
+validation_Materials_13,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 11.6*10^(-3) rad,phrase,C,C,rule,length,16384,0.0378,0.988,False
+validation_Materials_19,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 1.6*10^(-3) mm/mm,phrase,"1.2e-3, and the strain is small.",,fail,length,16384,0.0533,0.983,False
+validation_Materials_20,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. 0.0281*10^(-3) mm/mm,phrase,"0.00680, and we need to calculate it as (3 - 2)/400 = 1/400 = 0.0025 — not.",,fail,length,16384,0.0532,0.986,False
+validation_Materials_22,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. 0.0356 in^2,none,"To determine the required cross-sectional area of member **BC**, we need to:
+
+1. **Find the force in member BC** using method of joints or sections.
+2. **Determine the axial stress** in member BC.
+3. ",,fail,length,16384,0.0171,0.99,False
+validation_Materials_25,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 0.841 g/cm^3,phrase,0.841 because of rounding.,,fail,length,16384,0.0488,0.0,True
+validation_Materials_27,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. 250 psi,none,"We are given:
+
+- The wooden specimen is subjected to an **average normal stress** of **2 ksi** (i.e., 2000 psi) along the axis of the specimen.
+- We are to find the **average shear stress** along sect",,fail,length,16384,0.0657,0.917,False
+validation_Materials_3,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. 1.10 MPa,phrase,"1.77 MPa, but that’s not in options.",,fail,length,16384,0.0427,0.972,False
+validation_Materials_30,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. 0.00443 mm/mm,none,"We are given a triangular plate fixed at its base, with apex A displaced horizontally by 5 mm. We are to find the **average normal strain εₓ along the x-axis**.
+
+---
+
+### Step 1: Understand the geomet",,fail,length,16384,0.0219,0.95,False
+validation_Materials_4,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 7.77 MPa,phrase,-65.1 MPa — and we have a mistake in the sign.,A,rule,length,16384,0.1171,0.812,False
+validation_Materials_6,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. [-430],none,"To determine the Miller indices for a direction in a crystal lattice, we use the **direction vector** relative to the unit cell axes. The steps are:
+
+1. **Identify the intercepts** of the direction ve",A,rule,length,16384,0.0332,0.984,False
+validation_Materials_9,Materials,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 62.2 MPa,none,"To determine the **average shear stress** in pin B subjected to **double shear**, we need to:
+
+1. **Find the force acting on pin B** (i.e., the shear force in the pin).
+2. **Calculate the cross-sectio",,fail,length,16384,0.1218,0.983,False
+validation_Mechanical_Engineering_11,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"A. 41.7Mpa,44.83Mpa",none,"To find the **maximum stress at the hole and the notch**, we need to analyze the given figure, which shows a **rectangular bar** subjected to **axial tensile loads of 65000 N on both ends**. The bar h",,fail,length,16384,0.0273,0.971,False
+validation_Mechanical_Engineering_18,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. $\alpha=(pw_{2}i-pw_{1}j+w_{1}w_{2}k)rad/s^{2}$,phrase,C,C,rule,length,16384,0.0511,0.99,False
+validation_Mechanical_Engineering_2,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. D,phrase,A,A,rule,length,16384,0.033,1.0,False
+validation_Mechanical_Engineering_21,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"A. h=125.358m,t=27.62s",boxed,"h = 125.358 \, m",,fail,length,16384,0.0587,0.96,False
+validation_Mechanical_Engineering_22,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"B. 6857lb,1643lb",none,"We are given a bolted joint with fluctuating load between 0 and 8000 lb. The clamped plates have stiffness $ k_c = 6k_b $. The bolt is made of cold-drawn steel, and we assume threads stop immediately ",,fail,length,16384,0.0386,0.993,True
+validation_Mechanical_Engineering_23,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. 14700lb,none,"To find the maximum tensile load that can be applied to the welded plates, we need to calculate the **allowable shear stress** in the welds and then use the **weld strength formula** for fillet welds.",,fail,length,16384,0.0888,0.979,False
+validation_Mechanical_Engineering_27,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. F=7480lbf,phrase,7490 — which is close to 7500 — but 11966 is not close.,,fail,length,16384,0.1287,0.809,False
+validation_Mechanical_Engineering_28,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. 37.59,phrase,not listed.,,fail,length,16384,0.0727,0.979,False
+validation_Mechanical_Engineering_3,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. B,phrase,"(d) — because it shows the semicircular indentation on the left side, which matches the U-shape in the top view.",,fail,length,16384,0.0376,0.981,False
+validation_Mechanical_Engineering_5,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. K>0,none,"To determine the range of **K** for which the system is stable using the **Routh-Hurwitz criterion**, we need to:
+
+1. **Find the characteristic equation** of the closed-loop system.
+2. **Construct the",,fail,length,16384,0.028,0.996,False
+validation_Mechanical_Engineering_8,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. $h=1.644\times10^{5}km$,none,"To determine the distance $ h $ at which the spacecraft S experiences equal gravitational attractions from the Earth and the Sun, we use **Newton’s Law of Universal Gravitation**.
+
+---
+
+### Step 1: Se",,fail,length,16384,0.0683,0.955,False
+validation_Mechanical_Engineering_9,Mechanical_Engineering,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,"C. K2=0.06,K1=0.277",none,"To solve this problem, we need to analyze the given feedback control system and derive the closed-loop transfer function. Then, using the desired peak time and settling time, we can determine the valu",,fail,length,16384,0.0741,0.985,False
+validation_Music_20,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. ABCD,phrase,none — but that’s not an option.,,fail,length,16384,0.0451,0.991,False
+validation_Music_21,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. augmented 5th,none,"To determine the harmonic interval between the third horn (Cor. III) and the second violins (Violine II) in bar 11, we must analyze the notes written on their respective staves.
+
+First, locate bar 11 ",A,rule,length,16384,0.0268,0.988,False
+validation_Music_23,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. box 3,none,"To solve this, we need to convert the compound time signature (9/8) into simple time. In compound time, each beat is divided into three equal parts. So, 9/8 means 3 beats per measure, each beat being ",,fail,length,16384,0.0672,0.981,False
+validation_Music_24,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,D. Ic,none,"To determine the chord labeled **C** in the given piano score in the key of **B♭ major**, let’s follow a step-by-step approach:
+
+---
+
+### Step 1: Understand the key signature
+The key signature is **B♭",,fail,length,16384,0.048,0.995,False
+validation_Music_28,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. minor 7th,none,"To determine the interval between the two notes shown in the staff, let’s analyze the notation:
+
+- The **left note** is a **C** (the note on the first line of the treble clef), and it has a **♭ symbol",,fail,length,16384,0.0211,0.975,True
+validation_Music_30,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,A. circle the first option,none,"To determine the correct key of the melody, we must analyze the notes and their relationship to the given key signatures.
+
+The melody is written in **2/4 time** with a **treble clef** and includes the",,fail,length,16384,0.0192,0.951,False
+validation_Music_6,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. Hemiola,none,"The second measure of the given piano score shows a rhythmic pattern that begins with a **rest** (or a note on the first beat) and then continues with a sequence of notes. However, looking closely at ",A,rule,length,16384,0.0181,0.985,False
+validation_Music_7,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. Vc,none,"To determine the chord at position **A** in the key of **E minor**, we must first understand the harmonic structure of E minor.
+
+---
+
+### Step 1: Identify the key signature
+The key signature is **E mi",,fail,length,16384,0.0422,0.985,False
+validation_Music_8,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,B. AØ7,none,"The given image shows a piano chord chart with two staves: treble and bass. The treble clef has a **C major key signature** (three sharps: F#, C#, G#), and the bass clef also has the same key signatur",,fail,length,16384,0.0359,0.967,False
+validation_Music_9,Music,multiple-choice,1. 응답 잘림 - 반복 루프,trunc_loop,,,C. BC,none,"To solve this, we need to understand what a **first inversion of a major-minor seventh chord** looks like.
+
+---
+
+### Step 1: Understand the chord structure
+
+A **major-minor seventh chord** (also calle",D,rule,length,16384,0.0376,0.987,False
+validation_Pharmacy_19,Pharmacy,open,1. 응답 잘림 - 반복 루프,trunc_loop,,,B,phrase,Step D.,,fail,length,16384,0.0458,0.991,False
+validation_Agriculture_12,Agriculture,multiple-choice,2. 최종 답 없음,no_answer,,explicitly picks no option ('no option is correct'),A. Cholera,phrase,"None of the above — but if forced to choose, no option is correct.",,fail,stop,380,0.4844,0.0,False
+validation_Electronics_25,Electronics,open,2. 추출 실패 (답은 맞음),extract_fail,,"'Answer:' line is a sentence, the value '50V' is on the next line -> extractor keeps only the sentence",50,phrase,"Given the ambiguity in terminology, and based on standard interpretation in rectifier circuits, the safe PRV (Peak Reverse Voltage) rating for the diode is:",,fail,stop,1200,0.406,0.0,True
+validation_Basic_Medical_Science_10,Basic_Medical_Science,open,3. 표기 차이,notation,,"answers 'c' (correct); open gold 'C' is a letter -> MMMU_preproc maps the response to A, gt stays 'C' -> can never match",C,phrase,c,A,rule,stop,240,0.4302,0.0,False
+validation_Biology_10,Biology,open,3. 표기 차이,notation,,\dfrac{1}{64} vs 1/64,1/64,boxed,\dfrac{1}{64},,fail,stop,979,0.3967,0.043,False
+validation_Electronics_2,Electronics,open,3. 표기 차이,notation,,2\sqrt{2} (=2.828) vs 2.83,2.83,boxed,2\sqrt{2},,fail,stop,584,0.5021,0.0,False
+validation_Electronics_27,Electronics,open,3. 표기 차이,notation,,240 deg vs -120 deg: same angle,-120,phrase,240,,fail,stop,1063,0.4054,0.0,False
+validation_Finance_17,Finance,open,3. 표기 차이,notation,,"1,000 vs 1000 (thousands separator)",1000,phrase,"1,000",,fail,stop,862,0.4466,0.0,False
+validation_Finance_20,Finance,open,3. 표기 차이,notation,,"7,243,000 vs 7243000 (thousands separator)",7243000,phrase,"7,243,000",,fail,stop,1359,0.3929,0.0,True
+validation_Finance_30,Finance,open,3. 표기 차이,notation,,"1,249.24 vs 1249 (separator; gold is the rounded value)",1249,phrase,"1,249.24",,fail,stop,747,0.4505,0.0,False
+validation_Manage_20,Manage,open,3. 표기 차이,notation,,"'2,960 unfavorable' vs 2960 (separator + trailing word)",2960,phrase,"2,960 unfavorable",,fail,stop,271,0.4858,0.0,False
+validation_Math_15,Math,open,3. 표기 차이,notation,,"\frac{24}{7} vs ['24/7','3.429'] (list gold is never matched by the Qwen scorer either)","['24/7', '3.429']",boxed,\frac{24}{7},,fail,stop,619,0.4277,0.0,False
+validation_Math_24,Math,multiple-choice,3. 표기 차이,notation,,'Final Answer: r = \frac{2R}{3}' is option A in LaTeX; 'Correct Option: A' comes later but is not a marker,A. r = 2R/3,phrase,r = \frac{2R}{3},,fail,stop,1225,0.3726,0.0,False
+validation_Accounting_1,Accounting,multiple-choice,4. 객관식 오답,mc_wrong,,,B. $7,phrase,C,C,rule,stop,5779,0.2136,0.124,False
+validation_Accounting_15,Accounting,multiple-choice,4. 객관식 오답,mc_wrong,,,"A. $4,840",phrase,C,C,rule,stop,12230,0.293,0.062,False
+validation_Accounting_30,Accounting,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Yes,phrase,B,B,rule,stop,632,0.5014,0.0,False
+validation_Agriculture_11,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Confused,phrase,A,A,rule,stop,245,0.5117,0.0,False
+validation_Agriculture_13,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Remove all weeds as they will impact on yield,phrase,D,D,rule,stop,300,0.499,0.0,False
+validation_Agriculture_15,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Downy mildew (oomycete),phrase,D,D,rule,stop,258,0.5407,0.0,False
+validation_Agriculture_17,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,E. Powdery mildew,none,C. Unidentified fungal infection,C,rule,stop,7,1.25,0.0,False
+validation_Agriculture_20,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,E. Combination of fungal and abiotic dieback,none,C. Fungal dieback ('ash dieback'),C,rule,stop,12,1.0303,0.0,False
+validation_Agriculture_22,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Bacterial disease,phrase,A,A,rule,stop,230,0.5674,0.0,False
+validation_Agriculture_23,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,extract_fail,no marker; ends with '**B. Herbicide damage**' (gold D),D. Phytoplasma,none,"The image shows detached branches of *Gliricidia sepium*, with some leaves appearing sickly and yellowed (on the left), while adjacent branches display normal, healthy green foliage. The asymmetry in ",,fail,stop,287,0.5326,0.0,False
+validation_Agriculture_27,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. Yes, the fungi that make up the sooty mould family can be grown in culture.",phrase,A,A,rule,stop,278,0.5439,0.0,False
+validation_Agriculture_3,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,A. Algae,none,C. Powdery mildew,C,rule,stop,8,1.4706,0.0,False
+validation_Agriculture_4,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,E. Pot bound,phrase,D,D,rule,stop,280,0.5409,0.0,False
+validation_Agriculture_5,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,C. Chemical,none,D. Organic,D,rule,stop,4,1.8,0.0,False
+validation_Agriculture_8,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,B. Bacterial infection,none,D. Fungal infection,D,rule,stop,6,1.4211,0.0,False
+validation_Agriculture_9,Agriculture,multiple-choice,4. 객관식 오답,mc_wrong,,,D. High relative humidity,phrase,B,B,rule,stop,294,0.5421,0.0,False
+validation_Architecture_and_Engineering_16,Architecture_and_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,B. 1744veh/mi,phrase,A,A,rule,stop,9395,0.3136,0.076,False
+validation_Architecture_and_Engineering_2,Architecture_and_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 35.567 $\approx$ 36,phrase,C,C,rule,stop,1481,0.3869,0.034,True
+validation_Architecture_and_Engineering_22,Architecture_and_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. $\angle A = 263°45'$,$\angle B = 261°00'$,$\angle C = 243°00'$,$\angle D = 265°15'$,$\angle E = 227°00'$",boxed,C,C,rule,stop,9486,0.2941,0.033,False
+validation_Architecture_and_Engineering_23,Architecture_and_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. Bearing AE = 87°,47':Grade = 1.58 in 652.33 = 1 in 413",phrase,A,A,rule,stop,13220,0.1256,0.645,False
+validation_Architecture_and_Engineering_27,Architecture_and_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Distance CB = 748.40',boxed,A,A,rule,stop,13618,0.1315,0.63,False
+validation_Art_11,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,C. GEORGES SEURAT,phrase,B,B,rule,stop,129,0.6479,0.0,False
+validation_Art_14,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Charles Ginner,phrase,A,A,rule,stop,100,0.6406,0.0,False
+validation_Art_15,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,B. MICHELANGELO BUONARROTI,phrase,D,D,rule,stop,120,0.7018,0.0,False
+validation_Art_16,Art,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,B. False,none,A. True,A,rule,stop,4,2.1429,0.0,False
+validation_Art_19,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Photo 3,phrase,A,A,rule,stop,262,0.5119,0.0,False
+validation_Art_20,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Allan Ramsay,phrase,B,B,rule,stop,190,0.5813,0.0,False
+validation_Art_23,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Egg tempera,phrase,D,D,rule,stop,115,0.6453,0.0,False
+validation_Art_26,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Damascus,phrase,D,D,rule,stop,121,0.6548,0.0,False
+validation_Art_9,Art,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Brunelleschi,phrase,C,C,rule,stop,200,0.6089,0.0,False
+validation_Art_Theory_14,Art_Theory,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Mannerist,phrase,B,B,rule,stop,244,0.5454,0.0,False
+validation_Art_Theory_25,Art_Theory,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Hugo van der Goes,phrase,A,A,rule,stop,109,0.69,0.0,False
+validation_Art_Theory_5,Art_Theory,multiple-choice,4. 객관식 오답,mc_wrong,,,A. employed a mortise and tenon system for supporting lintels,phrase,C,C,rule,stop,319,0.49,0.0,False
+validation_Basic_Medical_Science_11,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Cardiac muscle,phrase,B,B,rule,stop,196,0.5749,0.0,False
+validation_Basic_Medical_Science_13,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Cranial Nerve IV.,phrase,C,C,rule,stop,98,0.6814,0.0,False
+validation_Basic_Medical_Science_18,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. A,phrase,B,B,rule,stop,219,0.4747,0.0,False
+validation_Basic_Medical_Science_22,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,B. False,phrase,A,A,rule,stop,557,0.4112,0.0,False
+validation_Basic_Medical_Science_23,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,E. Neutrophil,phrase,D,D,rule,stop,258,0.5299,0.0,False
+validation_Basic_Medical_Science_25,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Postganglionic parasympathetic cell bodies.,phrase,A,A,rule,stop,361,0.4433,0.0,False
+validation_Basic_Medical_Science_6,Basic_Medical_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Columnar epithelial cells detect activated Dendritic cells and secrete thymic stromal lymphocytes.,phrase,D,D,rule,stop,1306,0.3742,0.0,False
+validation_Biology_1,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Peroneus longus,phrase,A,A,rule,stop,298,0.4616,0.0,False
+validation_Biology_11,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,B. B,phrase,A,A,rule,stop,228,0.4856,0.0,False
+validation_Biology_14,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,E. 1/16,boxed,A,A,rule,stop,7300,0.2067,0.221,True
+validation_Biology_18,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,A. DNA replication,phrase,D,D,rule,stop,447,0.4572,0.0,False
+validation_Biology_22,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 3/8,phrase,C,C,rule,stop,4776,0.2115,0.025,False
+validation_Biology_23,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Hepatic flexure of colon,phrase,D,D,rule,stop,290,0.488,0.0,False
+validation_Biology_27,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,E. XAXa,phrase,B,B,rule,stop,8423,0.1626,0.033,True
+validation_Biology_29,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,C. <image 3>,phrase,A,A,rule,stop,393,0.4262,0.0,False
+validation_Biology_3,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,A. increase,phrase,B,B,rule,stop,328,0.5113,0.0,False
+validation_Biology_6,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Organism B,phrase,A,A,rule,stop,2327,0.2921,0.0,False
+validation_Biology_7,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,I. I,phrase,C,C,rule,stop,273,0.4748,0.0,False
+validation_Biology_9,Biology,multiple-choice,4. 객관식 오답,mc_wrong,,,E. ALQQMMDSILDY,phrase,A,A,rule,stop,1723,0.3343,0.5,False
+validation_Chemistry_11,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,B. A strong acid is titrated into a strong base.,phrase,C,C,rule,stop,264,0.4934,0.0,False
+validation_Chemistry_12,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,A. <image 2>,boxed,C,C,rule,stop,4680,0.2369,0.275,False
+validation_Chemistry_14,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,B. 5,boxed,A,A,rule,stop,6409,0.1327,0.453,False
+validation_Chemistry_17,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. P, R",phrase,A,A,rule,stop,6040,0.2322,0.207,False
+validation_Chemistry_22,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,B. (B),phrase,A,A,rule,stop,4608,0.222,0.112,False
+validation_Chemistry_24,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,D. 30.58 kJ/mol,phrase,C,C,rule,stop,15385,0.3248,0.068,True
+validation_Chemistry_26,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,extract_fail,'I'll go with B' (gold C); extractor took 'set (b).',C. <image 3>,phrase,set (b).,,fail,stop,4855,0.2097,0.449,False
+validation_Chemistry_29,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,D. <image 4>,boxed,A,A,rule,stop,4119,0.2612,0.119,False
+validation_Chemistry_3,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Product has less resonance energy,phrase,A,A,rule,stop,2611,0.2865,0.084,False
+validation_Chemistry_5,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,"C. 2S, 3S",phrase,A,A,rule,stop,7161,0.245,0.224,False
+validation_Chemistry_6,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,B. 1 and 3,phrase,E,E,rule,stop,991,0.3329,0.114,False
+validation_Chemistry_7,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 10,phrase,B,B,rule,stop,5024,0.2189,0.362,False
+validation_Chemistry_9,Chemistry,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Markovnikov orientation.,phrase,B,B,rule,stop,979,0.3676,0.0,False
+validation_Clinical_Medicine_11,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. 2 and 3,phrase,D,D,rule,stop,307,0.5162,0.0,False
+validation_Clinical_Medicine_14,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Lateral Decubitus,phrase,C,C,rule,stop,301,0.4985,0.0,False
+validation_Clinical_Medicine_16,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Glioblastoma,phrase,B,B,rule,stop,560,0.4676,0.0,False
+validation_Clinical_Medicine_18,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Normal Sinus Rhythm,phrase,E,E,rule,stop,231,0.5338,0.0,False
+validation_Clinical_Medicine_2,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,D. atrial flutter,phrase,C,C,rule,stop,381,0.492,0.0,False
+validation_Clinical_Medicine_20,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Accelerated Junctional Rhythm,phrase,D,D,rule,stop,260,0.5536,0.0,False
+validation_Clinical_Medicine_24,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Localized ileus,phrase,B,B,rule,stop,273,0.4872,0.0,False
+validation_Clinical_Medicine_28,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Diffuse scleroderma,phrase,B,B,rule,stop,2682,0.2524,0.056,True
+validation_Clinical_Medicine_30,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Prolonged immobilization,phrase,A,A,rule,stop,1040,0.3911,0.0,True
+validation_Clinical_Medicine_5,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Gallstones,phrase,C,C,rule,stop,292,0.466,0.0,False
+validation_Clinical_Medicine_7,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,E. Abruptio placenta,phrase,> C. Placenta accreta,C,rule,stop,615,0.4641,0.0,False
+validation_Clinical_Medicine_8,Clinical_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Complement mediated cell destruction,phrase,A,A,rule,stop,560,0.4749,0.0,True
+validation_Computer_Science_1,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. P1,phrase,D,D,rule,stop,3838,0.261,0.023,False
+validation_Computer_Science_11,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. <image 1>,phrase,B,B,rule,stop,4167,0.2318,0.141,False
+validation_Computer_Science_12,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. {a, b, e} {c, d, f, g, h}",boxed,C,C,rule,stop,11245,0.2186,0.19,False
+validation_Computer_Science_18,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,"C. V1,V5,V4,V7,V6,V3,V2",phrase,A,A,rule,stop,514,0.411,0.0,False
+validation_Computer_Science_19,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. (d-f),(a-b),(b-f),(d-e),(d-c)",boxed,A,A,rule,stop,7404,0.252,0.133,False
+validation_Computer_Science_2,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 24 is the left child of 13,phrase,A,A,rule,stop,3403,0.2984,0.057,False
+validation_Computer_Science_20,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Yes,phrase,B,B,rule,stop,445,0.4779,0.0,False
+validation_Computer_Science_24,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,B. 1,phrase,D,D,rule,stop,120,0.6335,0.0,False
+validation_Computer_Science_25,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Linear,phrase,B,B,rule,stop,319,0.527,0.0,False
+validation_Computer_Science_28,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. First, w1 becomes zero, and then w2 becomes zero",phrase,A,A,rule,stop,4676,0.2348,0.16,False
+validation_Computer_Science_4,Computer_Science,multiple-choice,4. 객관식 오답,mc_wrong,,,A. yes,phrase,B,B,rule,stop,5065,0.2655,0.045,True
+validation_Design_1,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,C. It conveys a historical narrative.,phrase,D,D,rule,stop,231,0.5274,0.0,False
+validation_Design_12,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Bell Sleeve,phrase,B,B,rule,stop,75,0.6559,0.0,False
+validation_Design_13,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,B. model the anatomy of the figures naturalistically,phrase,A,A,rule,stop,327,0.4912,0.0,False
+validation_Design_14,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,B. sixth or seventh century C. E.,phrase,C,C,rule,stop,388,0.5226,0.0,False
+validation_Design_2,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,D. to produce an idiosyncratic style characterized by the use of small dots of color,phrase,A,A,rule,stop,256,0.5715,0.0,False
+validation_Design_29,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,D. ocean currents and landforms,phrase,B,B,rule,stop,233,0.5315,0.0,False
+validation_Design_3,Design,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Proximity,phrase,D,D,rule,stop,161,0.5558,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_1,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. This tumor is a variant of glioblastoma multiforme (GBM),phrase,E,E,rule,stop,398,0.488,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_10,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Trypanosomiasis,phrase,D,D,rule,stop,482,0.4841,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_13,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,D. both B and C,phrase,A,A,rule,stop,305,0.5012,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_14,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,extract_fail,no marker; ends with '**B. Syringomyelia**' (gold A),A. Hydromyelia,none,"The image shows a transverse section of spinal cord tissue with a distinct, fluid-filled cavity (syrinx) running through the center, dividing the cord into two halves. The syrinx is surrounded by norm",,fail,stop,282,0.4915,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_15,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Premature birth,phrase,E,E,rule,stop,502,0.4359,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_16,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Glioblastoma,phrase,E,E,rule,stop,655,0.4566,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_17,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Either of the above,phrase,B,B,rule,stop,280,0.5091,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_18,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. caudate atrophy consistent with Huntington's Disease,phrase,A,A,rule,stop,297,0.4748,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_19,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Herpes Simplex encephalitis,phrase,E,E,rule,stop,1083,0.4303,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_2,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Medullary carcinoma of the thyroid gland,phrase,C,C,rule,stop,986,0.3474,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_20,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,E. Coccidiodal meningitis,phrase,A,A,rule,stop,483,0.4758,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_21,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. ependymoma,phrase,C,C,rule,stop,456,0.4705,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_22,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. may be intraventricular in children,phrase,D,D,rule,stop,437,0.481,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_23,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Eosinophilic granuloma,phrase,C,C,rule,stop,259,0.5596,0.0,True
+validation_Diagnostics_and_Laboratory_Medicine_24,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Progressive Multifocal Leukoencephalopathy (PML),phrase,C,C,rule,stop,589,0.4776,0.0,True
+validation_Diagnostics_and_Laboratory_Medicine_3,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Amebic encephalitis,phrase,A,A,rule,stop,717,0.4665,0.061,False
+validation_Diagnostics_and_Laboratory_Medicine_30,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Metastatic carcinoma with secondary infarcts,phrase,C,C,rule,stop,1264,0.3707,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_5,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,B. A mitochondrial disorder,phrase,C,C,rule,stop,446,0.4615,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_6,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. This dog has extra mediastinal fat, and megaesophagus is not identified.",phrase,A,A,rule,stop,482,0.4734,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_7,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,A. The differential diagnosis on this case is remote infarct vs. remote contusion,phrase,C,C,rule,stop,552,0.452,0.0,False
+validation_Diagnostics_and_Laboratory_Medicine_8,Diagnostics_and_Laboratory_Medicine,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Post-partum in term infant,phrase,A,A,rule,stop,222,0.5521,0.0,False
+validation_Economics_1,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 0,phrase,B,B,rule,stop,2814,0.2983,0.018,False
+validation_Economics_15,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Structural unemployment remained the same.,phrase,B,B,rule,stop,302,0.4885,0.0,False
+validation_Economics_19,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Dominant strategy is 'High output' (low price) for both firms.,phrase,C,C,rule,stop,1431,0.3132,0.0,False
+validation_Economics_23,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,B. $3418,phrase,A,A,rule,stop,855,0.438,0.0,False
+validation_Economics_24,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,C. There is not enough information in the problem statement to test this null.,phrase,B,B,rule,stop,698,0.4866,0.0,False
+validation_Economics_28,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Leisure time is 24 hours.,phrase,B,B,rule,stop,3058,0.2641,0.0,True
+validation_Economics_30,Economics,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 3,phrase,A,A,rule,stop,4674,0.2302,0.075,True
+validation_Energy_and_Power_16,Energy_and_Power,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 2.64,phrase,B,B,rule,stop,3672,0.3041,0.023,False
+validation_Energy_and_Power_22,Energy_and_Power,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 2.38E6 Pa,boxed,C,C,rule,stop,7218,0.312,0.083,False
+validation_Energy_and_Power_6,Energy_and_Power,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Jacketed Vessel,phrase,C,C,rule,stop,324,0.4756,0.0,False
+validation_Finance_14,Finance,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. $9,340",phrase,B,B,rule,stop,5645,0.1435,0.604,False
+validation_Finance_15,Finance,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Project A: 22%; Project B: 23.37%,phrase,C,C,rule,stop,9627,0.3272,0.029,False
+validation_Finance_29,Finance,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Project A: does's exist; Project B: 3 years; Project C: 5 years,phrase,B,B,rule,stop,5646,0.2721,0.112,True
+validation_Geography_10,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. l.(a) >L(a);l(b)>l,(b)",boxed,A,A,rule,stop,5470,0.281,0.081,False
+validation_Geography_11,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,D. lateral moraines ,phrase,C,C,rule,stop,239,0.494,0.0,False
+validation_Geography_13,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,D. 02-01-C5-007,phrase,C,C,rule,stop,413,0.4736,0.0,True
+validation_Geography_17,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,D. 2.5D,phrase,C,C,rule,stop,146,0.5958,0.0,False
+validation_Geography_2,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Number of joints,phrase,C,C,rule,stop,2088,0.2986,0.022,True
+validation_Geography_23,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Equilateral angle steel,phrase,A,A,rule,stop,1066,0.3578,0.0,False
+validation_Geography_24,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Heavy power penetration,phrase,D,D,rule,stop,305,0.4727,0.0,False
+validation_Geography_27,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Soft plastic,phrase,A,A,rule,stop,343,0.4797,0.0,False
+validation_Geography_30,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 24.0m,phrase,B,B,rule,stop,2385,0.3517,0.0,False
+validation_Geography_5,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 2.5A and 0A,boxed,B,B,rule,stop,7878,0.1942,0.45,False
+validation_Geography_6,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 18,boxed,A,A,rule,stop,5552,0.2794,0.078,False
+validation_Geography_7,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,D. wealth 2021 years ago.,phrase,A,A,rule,stop,80,0.6745,0.0,False
+validation_Geography_9,Geography,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Kiribati,phrase,A,A,rule,stop,422,0.5137,0.0,False
+validation_History_10,History,multiple-choice,4. 객관식 오답,mc_wrong,,,B. ALl nations involved in World War I at its outbreak are to blame for it,phrase,D,D,rule,stop,376,0.512,0.0,False
+validation_History_13,History,multiple-choice,4. 객관식 오답,mc_wrong,,,A. The capital of West Germany was located in East Germany,phrase,C,C,rule,stop,1504,0.337,0.036,False
+validation_History_2,History,multiple-choice,4. 객관식 오답,mc_wrong,,,D. The passage of the Fifteenth Amendment,phrase,A,A,rule,stop,556,0.4537,0.0,False
+validation_History_23,History,multiple-choice,4. 객관식 오답,mc_wrong,,,B. government inspectors turned their backs to illegal repression of labor unions,phrase,C,C,rule,stop,360,0.47,0.0,False
+validation_History_30,History,multiple-choice,4. 객관식 오답,mc_wrong,,,C. British ships did not sail the Pacific Ocean during this period.,phrase,A,A,rule,stop,2432,0.2787,0.0,False
+validation_History_5,History,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Support of these countries' agrarian populations for protectionist trade policies,phrase,B,B,rule,stop,290,0.4982,0.0,False
+validation_History_6,History,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. The Soviet Union saw communism as primarily a militaristic philosophy, while Marx argued for a peaceful approach",phrase,"> A. The Soviet Union saw communism as developing most effectively within a single country, while Marx envisioned it as an international movement",A,rule,stop,619,0.4257,0.0,False
+validation_History_7,History,multiple-choice,4. 객관식 오답,mc_wrong,,,"A. although European individuals and countries might be seduced into waging another major war, the United States would be wise to avoid participating.",phrase,B,B,rule,stop,676,0.467,0.0,False
+validation_History_8,History,multiple-choice,4. 객관식 오답,mc_wrong,,,C. European nations began to look outward for economic opportunities,phrase,A,A,rule,stop,472,0.4765,0.0,False
+validation_Literature_18,Literature,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Informational Books,phrase,D,D,rule,stop,257,0.5463,0.0,False
+validation_Literature_21,Literature,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Computer,phrase,C,C,rule,stop,144,0.5552,0.0,False
+validation_Literature_24,Literature,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Nuclear Family,phrase,D,D,rule,stop,233,0.5181,0.0,False
+validation_Literature_26,Literature,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Religious Stories,phrase,D,D,rule,stop,205,0.5167,0.0,False
+validation_Literature_28,Literature,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Survival And Adventure,phrase,D,D,rule,stop,264,0.5462,0.0,False
+validation_Manage_12,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Yes,phrase,B,B,rule,stop,353,0.4633,0.0,False
+validation_Manage_19,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Focus on product innovation,phrase,C,C,rule,stop,387,0.456,0.0,False
+validation_Manage_24,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 1,phrase,B,B,rule,stop,797,0.4093,0.0,False
+validation_Manage_26,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,"A. Slacks are: 0, 2, 11, 0, 2, 11, 0",boxed,C,C,rule,stop,10972,0.1498,0.509,True
+validation_Manage_27,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Emotional,phrase,A,A,rule,stop,191,0.5317,0.0,False
+validation_Manage_4,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 27030,phrase,B,B,rule,stop,2211,0.4475,0.0,False
+validation_Manage_6,Manage,multiple-choice,4. 객관식 오답,mc_wrong,extract_fail,"says the question is broken, then 'if forced: B' (gold D)",D. synthetic,phrase,"The question contains an error — no image 1 exists, and no brain comparison is depicted. Therefore, none of the options are valid based on the provided material.",,fail,stop,556,0.4626,0.0,False
+validation_Manage_7,Manage,multiple-choice,4. 객관식 오답,mc_wrong,,,B. This product has ongoing sales value,phrase,C,C,rule,stop,496,0.4428,0.125,False
+validation_Marketing_13,Marketing,multiple-choice,4. 객관식 오답,mc_wrong,,,"A. 1-III, 2-IV, 3-I, 4-II",phrase,C,C,rule,stop,254,0.5312,0.0,False
+validation_Marketing_14,Marketing,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 0.125,phrase,B,B,rule,stop,219,0.5191,0.0,False
+validation_Marketing_18,Marketing,multiple-choice,4. 객관식 오답,mc_wrong,,,C. 0.0004,phrase,D,D,rule,stop,10229,0.2697,0.132,False
+validation_Marketing_4,Marketing,multiple-choice,4. 객관식 오답,mc_wrong,,,A. The distribution is skewed left.,phrase,B,B,rule,stop,181,0.5165,0.0,False
+validation_Marketing_8,Marketing,multiple-choice,4. 객관식 오답,mc_wrong,,,A. True.,phrase,B,B,rule,stop,309,0.4626,0.0,False
+validation_Materials_11,Materials,multiple-choice,4. 객관식 오답,mc_wrong,,,D. 1.49 kN,boxed,A,A,rule,stop,12761,0.1057,0.694,True
+validation_Materials_12,Materials,multiple-choice,4. 객관식 오답,mc_wrong,,,B. 5 MPa,phrase,C,C,rule,stop,626,0.4501,0.0,False
+validation_Materials_2,Materials,multiple-choice,4. 객관식 오답,mc_wrong,,,B. (P/A)sin^2($\theta$),phrase,C,C,rule,stop,7565,0.2268,0.197,True
+validation_Math_13,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,C. $16+16 \sqrt{2}-16 \sqrt{3}$,boxed,B,B,rule,stop,6963,0.316,0.0,False
+validation_Math_17,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,A. $\theta = \pi /2$,phrase,B,B,rule,stop,6584,0.3117,0.061,False
+validation_Math_18,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,A. a,phrase,B,B,rule,stop,349,0.4882,0.0,False
+validation_Math_2,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. (a) 2, (b) 3",boxed,C,C,rule,stop,13956,0.1472,0.702,False
+validation_Math_20,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. Graph G2 with vertices v1 to v8 and arcs including (v2, v5) and (v4, v8).",phrase,A,A,rule,stop,4241,0.3635,0.014,False
+validation_Math_26,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,D. $\int_{0}^{a}\left[b-g(x)+f(x)\right]d x$,boxed,A,A,rule,stop,6014,0.2264,0.13,False
+validation_Math_3,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,B. <image 2>,phrase,C,C,rule,stop,3545,0.2797,0.016,False
+validation_Math_4,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,A. $y=\cos 2\pix$,phrase,C,C,rule,stop,1000,0.4153,0.0,False
+validation_Math_7,Math,multiple-choice,4. 객관식 오답,mc_wrong,,,"A. (1), (2), (3), (4), (5), (6)",phrase,C,C,rule,stop,1714,0.2748,0.149,True
+validation_Math_9,Math,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,B. No,none,A. Yes,A,rule,stop,4,2.3333,0.0,False
+validation_Mechanical_Engineering_1,Mechanical_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,D. D,phrase,C,C,rule,stop,2800,0.2527,0.051,True
+validation_Mechanical_Engineering_13,Mechanical_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,A. A,phrase,B,B,rule,stop,596,0.4227,0.0,True
+validation_Mechanical_Engineering_25,Mechanical_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,B. $R_{A}=R_{C}=-1.429kips$,phrase,C,C,rule,stop,8018,0.2499,0.207,False
+validation_Mechanical_Engineering_7,Mechanical_Engineering,multiple-choice,4. 객관식 오답,mc_wrong,,,"B. 4.8-hp input,4.3-hp output",phrase,C,C,rule,stop,7221,0.2308,0.323,False
+validation_Music_1,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,C. <image 4>,phrase,A,A,rule,stop,4219,0.1796,0.36,False
+validation_Music_11,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,C. lower morden,phrase,D,D,rule,stop,273,0.4821,0.0,False
+validation_Music_15,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,A. C,phrase,D,D,rule,stop,116,0.5359,0.0,False
+validation_Music_16,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,B. <image 2>,phrase,A,A,rule,stop,693,0.346,0.0,False
+validation_Music_17,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,B. second clef,phrase,A,A,rule,stop,334,0.4433,0.0,False
+validation_Music_19,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,B. B,phrase,C,C,rule,stop,2565,0.257,0.219,False
+validation_Music_2,Music,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,A. True,none,B. False,B,rule,stop,4,2.0,0.0,False
+validation_Music_22,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Major seventh in third inversion,phrase,B,B,rule,stop,1416,0.376,0.0,False
+validation_Music_25,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,B. major,phrase,C,C,rule,stop,1109,0.3433,0.0,False
+validation_Music_29,Music,multiple-choice,4. 객관식 오답,mc_wrong,short_answer_no_marker,,D. box4,none,C. box3,C,rule,stop,5,2.1429,0.0,False
+validation_Music_3,Music,multiple-choice,4. 객관식 오답,mc_wrong,,,B. major,phrase,C,C,rule,stop,181,0.5345,0.286,False
+validation_Pharmacy_13,Pharmacy,multiple-choice,4. 객관식 오답,mc_wrong,,,B. False,phrase,A,A,rule,stop,201,0.5,0.0,True
+validation_Pharmacy_17,Pharmacy,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Dactinomycin,phrase,D,D,rule,stop,328,0.4884,0.0,False
+validation_Pharmacy_21,Pharmacy,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Base pairing between adenine and thymine is disrupted by the agent.,phrase,D,D,rule,stop,478,0.4782,0.0,False
+validation_Pharmacy_23,Pharmacy,multiple-choice,4. 객관식 오답,mc_wrong,,,C. The cyclisation is defined as 6-endo-tet and is allowed by Baldwin's rules,phrase,D,D,rule,stop,2384,0.3203,0.029,False
+validation_Pharmacy_28,Pharmacy,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. -COOH,acetic acid",phrase,C,C,rule,stop,385,0.4636,0.0,False
+validation_Physics_12,Physics,multiple-choice,4. 객관식 오답,mc_wrong,,,"D. negative in I, positive in III",phrase,B,B,rule,stop,4691,0.1582,0.341,False
+validation_Physics_15,Physics,multiple-choice,4. 객관식 오답,mc_wrong,,,D. $\lambda $/4,phrase,C,C,rule,stop,2785,0.2909,0.116,False
+validation_Physics_19,Physics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. A,phrase,C,C,rule,stop,1388,0.3644,0.0,False
+validation_Physics_2,Physics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. To the right/To the right,phrase,B,B,rule,stop,1116,0.3331,0.0,False
+validation_Physics_20,Physics,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 1.5 eV,phrase,B,B,rule,stop,2534,0.3605,0.024,False
+validation_Physics_7,Physics,multiple-choice,4. 객관식 오답,mc_wrong,,,E. the sun might be at point B,phrase,D,D,rule,stop,3010,0.2616,0.02,False
+validation_Psychology_12,Psychology,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Vygotsky,phrase,C,C,rule,stop,514,0.4468,0.0,False
+validation_Psychology_24,Psychology,multiple-choice,4. 객관식 오답,mc_wrong,,,D. reticular formation,phrase,A,A,rule,stop,70,0.67,0.0,False
+validation_Psychology_4,Psychology,multiple-choice,4. 객관식 오답,mc_wrong,,,B. Cannon-Bard Theory,phrase,C,C,rule,stop,324,0.4585,0.0,False
+validation_Psychology_5,Psychology,multiple-choice,4. 객관식 오답,mc_wrong,,,D. occipital lobe,phrase,C,C,rule,stop,357,0.4119,0.0,False
+validation_Psychology_6,Psychology,multiple-choice,4. 객관식 오답,mc_wrong,,,A. A,phrase,D,D,rule,stop,336,0.4651,0.0,False
+validation_Psychology_9,Psychology,multiple-choice,4. 객관식 오답,mc_wrong,,,A. Perception of authority,phrase,D,D,rule,stop,2227,0.2527,0.053,False
+validation_Public_Health_1,Public_Health,multiple-choice,4. 객관식 오답,mc_wrong,,,C. tr=tb,phrase,B,B,rule,stop,2591,0.4279,0.067,False
+validation_Public_Health_24,Public_Health,multiple-choice,4. 객관식 오답,mc_wrong,,,D. 0.44%,boxed,B,B,rule,stop,5201,0.2367,0.146,False
+validation_Public_Health_9,Public_Health,multiple-choice,4. 객관식 오답,mc_wrong,,,A. 0.93,phrase,D,D,rule,stop,7949,0.1916,0.338,True
+validation_Sociology_1,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,B. A conflict crime,phrase,C,C,rule,stop,269,0.515,0.0,False
+validation_Sociology_12,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Symbolic Interactionist,phrase,D,D,rule,stop,513,0.4581,0.0,False
+validation_Sociology_15,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Lack of power,phrase,B,B,rule,stop,71,0.6685,0.0,False
+validation_Sociology_21,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Feminist perspective,phrase,A,A,rule,stop,281,0.4907,0.0,False
+validation_Sociology_23,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,D. All of the above,phrase,B,B,rule,stop,355,0.4936,0.0,False
+validation_Sociology_25,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Physical activity and healthy eating are a fundamental part of a child's education.,phrase,B,B,rule,stop,417,0.47,0.0,False
+validation_Sociology_27,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,D. Any of the above,phrase,A,A,rule,stop,420,0.4802,0.0,False
+validation_Sociology_3,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,B. The strategies some use to direct the behaviour and actions of others,phrase,A,A,rule,stop,206,0.4958,0.0,False
+validation_Sociology_5,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,C. Highly skilled jobs pay better than low-skill jobs.,phrase,A,A,rule,stop,380,0.5463,0.0,False
+validation_Sociology_9,Sociology,multiple-choice,4. 객관식 오답,mc_wrong,,,A. symbolic interactionism,phrase,C,C,rule,stop,263,0.5346,0.0,False
+validation_Chemistry_20,Chemistry,open,5. 주관식 오답,open_wrong,,,5,boxed,3,,fail,stop,2680,0.2992,0.0,False
+validation_Chemistry_23,Chemistry,open,5. 주관식 오답,open_wrong,,,6.5,none,0.0246,,fail,stop,7,2.3333,0.0,False
+validation_Chemistry_30,Chemistry,open,5. 주관식 오답,open_wrong,,,"['$MgS$', 'MgS']",boxed,MgO,,fail,stop,1831,0.3652,0.0,False
+validation_Chemistry_4,Chemistry,open,5. 주관식 오답,open_wrong,,,trans-1-Chloro-4-methylcyclohexane,phrase,cis-1-chloro-2-methylcyclohexane,,fail,stop,621,0.4379,0.0,False
+validation_Computer_Science_26,Computer_Science,open,5. 주관식 오답,open_wrong,,,251,none,156,,fail,stop,4,3.6667,0.0,False
+validation_Electronics_16,Electronics,open,5. 주관식 오답,open_wrong,,,20,boxed,\frac{100}{3},,fail,stop,757,0.422,0.0,False
+validation_Electronics_21,Electronics,open,5. 주관식 오답,open_wrong,,,0.9965,boxed,0,,fail,stop,5656,0.2661,0.031,False
+validation_Electronics_24,Electronics,open,5. 주관식 오답,open_wrong,,,551,boxed,580\ k\Omega,,fail,stop,1713,0.3432,0.0,False
+validation_Electronics_26,Electronics,open,5. 주관식 오답,open_wrong,,,6.333,boxed,11,,fail,stop,7378,0.1672,0.253,False
+validation_Electronics_29,Electronics,open,5. 주관식 오답,open_wrong,,,30,boxed,28.8,,fail,stop,12169,0.275,0.067,False
+validation_Electronics_30,Electronics,open,5. 주관식 오답,open_wrong,,,-141,boxed,45.84,,fail,stop,3849,0.2886,0.035,False
+validation_Electronics_4,Electronics,open,5. 주관식 오답,open_wrong,,,8.4,boxed,"V_{CEQ} \approx 7.0 \, V",,fail,stop,1131,0.4347,0.0,False
+validation_Electronics_5,Electronics,open,5. 주관식 오답,open_wrong,,,62.6,boxed,"50 \, \Omega",,fail,stop,2353,0.305,0.033,False
+validation_Finance_10,Finance,open,5. 주관식 오답,open_wrong,,,2000000,boxed,"1,646,100",,fail,stop,2429,0.3695,0.112,False
+validation_Finance_24,Finance,open,5. 주관식 오답,open_wrong,,,30.0,phrase,20,,fail,stop,572,0.4771,0.0,False
+validation_Finance_8,Finance,open,5. 주관식 오답,open_wrong,,,360,phrase,860,,fail,stop,4293,0.2897,0.099,True
+validation_Geography_14,Geography,open,5. 주관식 오답,open_wrong,,,8200,boxed,2240,,fail,stop,10493,0.1176,0.8,False
+validation_Pharmacy_26,Pharmacy,open,5. 주관식 오답,open_wrong,,,A,phrase,B,B,rule,stop,221,0.5472,0.0,False
+validation_Physics_21,Physics,open,5. 주관식 오답,open_wrong,,,A,boxed,D,,fail,stop,2047,0.3187,0.0,True
+validation_Chemistry_13,Chemistry,open,6. 애매 (따로 모음),ambiguous,,13.0 vs 12.97: model value is coarser than gold (3 s.f.) - rounding or a small arithmetic slip (it computed 13.006),12.97,phrase,13.0 g of calcium hydroxide was dissolved.,,fail,stop,411,0.4927,0.0,False
+validation_Chemistry_25,Chemistry,open,6. 애매 (따로 모음),ambiguous,,24.3 vs 24.32: model value is coarser than gold,24.32,none,24.3,,fail,stop,5,3.0,0.0,False
+validation_Electronics_9,Electronics,multiple-choice,6. 애매 (따로 모음),ambiguous,truncated,trunc: cycles through guessed waveforms/series without verbatim repetition,C. -2[sin t + (1 / 2) sin 25 + (1 / 3) sin 3t + ...],phrase,"option A, with "" sin 25 "" meaning sin(2t), and "" sin 30 "" meaning sin(3t), and the coefficients are 1/2, 1/3, etc., and the sign is correct.",,fail,length,16384,0.1683,0.373,True
+validation_Finance_23,Finance,open,6. 애매 (따로 모음),ambiguous,,"527.74 vs 527.89 (0.03%): same method, intermediate rounding differs",527.89,phrase,527.74 million (rounded to two decimal places),,fail,stop,672,0.4443,0.0,False
+validation_Geography_4,Geography,open,6. 애매 (따로 모음),ambiguous,,"answers 'Clearwater, Florida' vs gold ['Tampa','Florida']: half right; list gold can't match in the Qwen scorer","['Tampa', 'Florida']",none,"The place described in the image is a map of Clearwater, Florida. It highlights key areas and landmarks such as:
+
+- **West Village**
+- **Clearwater Beach**
+- **St. Pete** (St. Petersburg)
+- **Downtown",,fail,stop,209,0.5654,0.0,False
+validation_Manage_3,Manage,open,6. 애매 (따로 모음),ambiguous,,"242,159.73 vs 242,110.62 (0.02%): close, intermediate rounding or a small error",242110.62,phrase,"242,159.73",,fail,stop,2470,0.318,0.022,False
+validation_Math_12,Math,multiple-choice,6. 애매 (따로 모음),ambiguous,truncated,"trunc: keeps re-trying constraint readings, all ending 'objective 0'",A. d_1^* = S_1 and d_2^* = 0 and d_3^* = 0 or S_3,phrase,"0, but not in the options.",,fail,length,16384,0.1806,0.177,False
+validation_Mechanical_Engineering_4,Mechanical_Engineering,multiple-choice,6. 애매 (따로 모음),ambiguous,truncated,trunc: 'Perhaps... Not matching' cycle; a few blocks repeat verbatim but below the 80% line,B. $q_{0}=350.7403\frac{kN}{m}$,phrase,"450.7403, and we have a mistake in the formula for the maximum moment.",,fail,length,16384,0.2075,0.403,False

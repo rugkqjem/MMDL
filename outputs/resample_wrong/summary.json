@@ -1,0 +1,125 @@
+{
+  "meta": {
+    "pred": "outputs/qwen3vl4b_mmmu_val/predictions.jsonl",
+    "k": 8,
+    "model_path": "Qwen/Qwen3-VL-4B-Instruct",
+    "max_new_tokens": 16384,
+    "generate_seconds": 1401.3,
+    "infer_args": {
+      "model_path": "Qwen/Qwen3-VL-4B-Instruct",
+      "model_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+      "data_root": null,
+      "dataset_revision": "98e6ac0cb9b7b2cd2c991b85a50762edc4aedc68",
+      "output": "outputs/resample_wrong/resample.jsonl",
+      "subjects": [
+        "Agriculture",
+        "Geography",
+        "Sociology",
+        "Chemistry"
+      ],
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "repetition_penalty": 1.0,
+      "presence_penalty": 1.5,
+      "seed": 3407,
+      "max_new_tokens": 16384,
+      "max_model_len": 32768,
+      "min_pixels": 1003520,
+      "max_pixels": 4014080,
+      "gpu_memory_utilization": 0.9,
+      "dtype": "bfloat16"
+    }
+  },
+  "table": [
+    {
+      "subject": "Agriculture",
+      "wrong_at_baseline": 14,
+      "never_solved": 11,
+      "recovered": 3,
+      "never_solved_pct": 78.57142857142857,
+      "recovered_pct": 21.428571428571427,
+      "mean_pass_rate_pct": 5.357142857142857,
+      "n_correct_hist": {
+        "0": 11,
+        "1": 2,
+        "4": 1
+      },
+      "truncated_samples": 0
+    },
+    {
+      "subject": "Geography",
+      "wrong_at_baseline": 17,
+      "never_solved": 7,
+      "recovered": 10,
+      "never_solved_pct": 41.1764705882353,
+      "recovered_pct": 58.8235294117647,
+      "mean_pass_rate_pct": 27.205882352941178,
+      "n_correct_hist": {
+        "0": 7,
+        "1": 2,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 2,
+        "7": 1
+      },
+      "truncated_samples": 7
+    },
+    {
+      "subject": "Sociology",
+      "wrong_at_baseline": 10,
+      "never_solved": 8,
+      "recovered": 2,
+      "never_solved_pct": 80.0,
+      "recovered_pct": 20.0,
+      "mean_pass_rate_pct": 13.75,
+      "n_correct_hist": {
+        "0": 8,
+        "5": 1,
+        "6": 1
+      },
+      "truncated_samples": 0
+    },
+    {
+      "subject": "Chemistry",
+      "wrong_at_baseline": 20,
+      "never_solved": 9,
+      "recovered": 11,
+      "never_solved_pct": 45.0,
+      "recovered_pct": 55.0,
+      "mean_pass_rate_pct": 23.75,
+      "n_correct_hist": {
+        "0": 9,
+        "1": 6,
+        "5": 1,
+        "6": 2,
+        "7": 1,
+        "8": 1
+      },
+      "truncated_samples": 20
+    },
+    {
+      "subject": "ALL",
+      "wrong_at_baseline": 61,
+      "never_solved": 35,
+      "recovered": 26,
+      "never_solved_pct": 57.377049180327866,
+      "recovered_pct": 42.622950819672134,
+      "mean_pass_rate_pct": 18.852459016393443,
+      "n_correct_hist": {
+        "0": 35,
+        "1": 10,
+        "2": 2,
+        "3": 1,
+        "4": 2,
+        "5": 3,
+        "6": 5,
+        "7": 2,
+        "8": 1
+      },
+      "truncated_samples": 27
+    }
+  ]
+}

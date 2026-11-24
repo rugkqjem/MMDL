@@ -5,3 +5,4 @@ transformers>=4.57.0
 qwen-vl-utils>=0.0.14
 datasets
 numpy
+peft>=0.21.0  # train_ft.py LoRA; tested with 0.21.2
