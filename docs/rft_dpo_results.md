@@ -1,7 +1,7 @@
 # RFT → DPO 실험 결과 (루프 줄이기)
 
 > - 2026-11-18 · 브랜치 `rl-grpo` · 모델: Qwen3-VL-4B-Instruct · 평가: MMMU-val 900문제
-> - 목표: 정답을 유지하면서 8192토큰까지 반복하다 잘리는 응답(루프)을 줄이기
+> - 목표: 정답을 유지하면서, 반복하다 출력 한도에서 잘리는 응답(루프)을 줄이기. 잘림 기준은 평가 16,384토큰, 학습 롤아웃·재샘플링 8,192토큰
 > - 모델: [yujin16/qwen3vl4b-mmmu-v1b](https://huggingface.co/yujin16/qwen3vl4b-mmmu-v1b) (v1b, LoRA 병합 완료)
 > - 실행 방법: `docs/dpo_impl_notes.md` · 두 루프 쌍 방식 비교: `docs/dpo_loop_pairs_compare.md`
 
