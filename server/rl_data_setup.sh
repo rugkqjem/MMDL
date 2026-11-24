@@ -4,7 +4,7 @@
 #   -> decontaminate.py -> 200-question pilot rollout -> pilot bucket report
 # Stops after the pilot on purpose: read the pilot responses before paying for the full rollout.
 #
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/rugkqjem/MMDL/rl-grpo/server/rl_data_setup.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/rugkqjem/MMDL/main/server/rl_data_setup.sh)"
 #   # or, once the repo is cloned:
 #   nohup bash server/rl_data_setup.sh > /workspace/rl_data_setup.log 2>&1 &   tail -f /workspace/rl_data_setup.log
 #
@@ -16,7 +16,7 @@ set -euo pipefail
 WS=/workspace
 REPO=$WS/MMDL
 VENV=$WS/venv
-BRANCH=${BRANCH:-rl-grpo}
+BRANCH=${BRANCH:-main}
 EXCLUDE=${EXCLUDE:-}   # too-easy questions are dropped by the rollout filter anyway
 MAX_PER_CAT=${MAX_PER_CAT:-3000}
 PILOT_N=${PILOT_N:-200}

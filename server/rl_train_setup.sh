@@ -15,7 +15,7 @@ set -euo pipefail
 WS=${WS:-/workspace}
 REPO=$WS/MMDL
 VENV=$WS/venv
-BRANCH=${BRANCH:-rl-grpo}
+BRANCH=${BRANCH:-main}
 PILOT_STEPS=${PILOT_STEPS:-20}
 SAMPLING=${SAMPLING:-train}
 TRUNC_PENALTY=${TRUNC_PENALTY:-0.5}
